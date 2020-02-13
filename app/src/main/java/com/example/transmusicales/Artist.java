@@ -25,8 +25,11 @@ public class Artist {
         return datasetid;
     }
 
-    public String getRecordid() {
-        return recordid;
+    public Artist(String datasetid, String recordid, String record_timestamp, String uid) {
+        this.datasetid = datasetid;
+        this.recordid = recordid;
+        this.record_timestamp = record_timestamp;
+        this.uid = uid;
     }
 
 /*    public Fields getFields() {

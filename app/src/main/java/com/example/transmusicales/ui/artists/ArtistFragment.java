@@ -41,6 +41,8 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         artists = new ArrayList<>();
+//        artists.add(new Artist());
+  //      artists.add(new Artist());
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
