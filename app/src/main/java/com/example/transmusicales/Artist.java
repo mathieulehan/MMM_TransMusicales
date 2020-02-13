@@ -5,8 +5,8 @@ import java.util.ArrayList;
 public class Artist {
     private String datasetid;
     private String recordid;
-    Fields FieldsObject;
-    Geometry GeometryObject;
+    //public Fields FieldsObject;
+    //public Geometry GeometryObject;
     private String record_timestamp;
 
     public String getUid() {
@@ -29,13 +29,13 @@ public class Artist {
         return recordid;
     }
 
-    public Fields getFields() {
+/*    public Fields getFields() {
         return FieldsObject;
-    }
+    }*/
 
-    public Geometry getGeometry() {
+/*    public Geometry getGeometry() {
         return GeometryObject;
-    }
+    }*/
 
     public String getRecord_timestamp() {
         return record_timestamp;
@@ -51,13 +51,13 @@ public class Artist {
         this.recordid = recordid;
     }
 
-    public void setFields(Fields fieldsObject) {
+/*    public void setFields(Fields fieldsObject) {
         this.FieldsObject = fieldsObject;
-    }
+    }*/
 
-    public void setGeometry(Geometry geometryObject) {
+/*    public void setGeometry(Geometry geometryObject) {
         this.GeometryObject = geometryObject;
-    }
+    }*/
 
     public void setRecord_timestamp(String record_timestamp) {
         this.record_timestamp = record_timestamp;
@@ -67,6 +67,8 @@ public class Artist {
         private String type;
         ArrayList<Object> coordinates = new ArrayList<Object>();
 
+        public Geometry() {
+        }
 
         // Getter Methods
 
@@ -99,6 +101,9 @@ public class Artist {
         private String deezer;
         private String cou_text_en;
         private String origine_pays1;
+
+        public Fields() {
+        }
 
 
         // Getter Methods

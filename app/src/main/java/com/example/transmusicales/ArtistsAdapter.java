@@ -1,7 +1,6 @@
 package com.example.transmusicales;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,12 +9,8 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.cardview.widget.CardView;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
-import com.example.transmusicales.ui.artists.ArtistFragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,12 +66,12 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.MyViewHo
     public void onBindViewHolder(MyViewHolder viewHolder, final int position) {
         final Artist artist = artistListFiltered.get(position);
 
-        if (artist.getFields().getArtistes() != null) {
+/*        if (artist.getFields().getArtistes() != null) {
             viewHolder.name.setText(artist.getFields().getArtistes());
             viewHolder.phone.setVisibility(TextView.VISIBLE);
             viewHolder.thumbnail.setVisibility(ImageView.GONE);
         }
-        viewHolder.marks.setText(artist.getFields().getMark());
+        viewHolder.marks.setText(artist.getFields().getMark());*/
     }
 
     @Override
@@ -98,7 +93,7 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.MyViewHo
                 .orElse(null);
         if (oldArtist != null) {
             artistListFiltered.set(artistListFiltered.indexOf(oldArtist), updatedArtist);
-            Log.i("TAG","updated mark from DB for "+updatedArtist+" = "+ updatedArtist.getFields().getMark());
+            //Log.i("TAG","updated mark from DB for "+updatedArtist+" = "+ updatedArtist.getFields().getMark());
         }
 
         oldArtist = artistList.stream()
@@ -125,9 +120,9 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.MyViewHo
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match
-                        if (row.getFields().getArtistes().toLowerCase().contains(charString.toLowerCase())) {
+                        /*if (row.getFields().getArtistes().toLowerCase().contains(charString.toLowerCase())) {
                             filteredList.add(row);
-                        }
+                        }*/
                     }
 
                     artistListFiltered = filteredList;

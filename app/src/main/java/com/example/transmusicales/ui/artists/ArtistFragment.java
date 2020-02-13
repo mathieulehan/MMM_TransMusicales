@@ -20,6 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +41,6 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         artists = new ArrayList<>();
-        artists.add(new Artist());
-        artists.add(new Artist());
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -49,19 +48,34 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
 
         View root = inflater.inflate(R.layout.fragment_artists, container, false);
 
+        artists = new ArrayList<>();
+
         // STEP 2 : access the DB...
         mFireDataBase = FirebaseDatabase.getInstance();
 
         // STEP 2.1: and from the DB, get a reference
-        mArtistsDatabaseReference = mFireDataBase.getReference();
+        mArtistsDatabaseReference = mFireDataBase.getReference().child("artistes");
 
-        // STEP 2.2: get the recycler view
+        mArtistsDatabaseReference.addValueEventListener(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                ArrayList<Artist> a = (ArrayList<Artist>) dataSnapshot.getValue();
+                                                                for (Artist newArtist: a) {
+                                                                    artists.add(newArtist);
+                                                                }
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                System.out.println("The read failed: " + databaseError.getCode());
+                                                            }
+                                                        });
+                                                            // STEP 2.2: get the recycler view
         recyclerView = root.findViewById(R.id.recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayoutManager);
 
         // STEP 2.3: create and set the adapter
-        artists = new ArrayList<>();
         mAdapter = new ArtistsAdapter(getContext(), artists, this);
         recyclerView.setAdapter(mAdapter);
 
@@ -77,10 +91,10 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
 
         // STEP 6.1: Updating the field in the class
         // TODO mettre la note donnée par l'utilisateur en calculant la motenne
-        artist.getFields().setMark("6.04");
+       /* artist.getFields().setMark("6.04");
 
         // STEP 6.2: Updating the field on the Firebase DB
-        mArtistsDatabaseReference.child(artist.getUid()).child("mark").setValue(artist.getFields().getMark());
+        mArtistsDatabaseReference.child(artist.getUid()).child("mark").setValue(artist.getFields().getMark());*/
 
     }
 
