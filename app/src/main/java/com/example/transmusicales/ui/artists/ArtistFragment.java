@@ -27,8 +27,6 @@ import java.util.List;
 
 public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAdapterListener{
 
-    private ArtistViewModel artistViewModel;
-
     // Firebase reference
     private FirebaseDatabase mFireDataBase;
     private DatabaseReference mContactsDatabaseReference;
@@ -39,17 +37,19 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
     //STEP 4: child event lister.
     private ChildEventListener mChildEventListener;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        artists = new ArrayList<>();
+        artists.add(new Artist("toto", null, 4.0));
+        artists.add(new Artist("toto2", null, 3.0));
+    }
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        artistViewModel = ViewModelProviders.of(this).get(ArtistViewModel.class);
+
         View root = inflater.inflate(R.layout.fragment_artists, container, false);
-        final TextView textView = root.findViewById(R.id.text_artist);
-        artistViewModel.getText().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+
         // STEP 2 : access the DB...
         mFireDataBase = FirebaseDatabase.getInstance();
 

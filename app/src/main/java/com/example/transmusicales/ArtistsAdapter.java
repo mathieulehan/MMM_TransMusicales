@@ -11,15 +11,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.cardview.widget.CardView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.transmusicales.ui.artists.ArtistFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.MyViewHolder>
-        implements Filterable {
+public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.MyViewHolder> implements Filterable {
     private Context context;
     List<Artist> artistList;
     List<Artist> artistListFiltered;
@@ -29,12 +30,14 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.MyViewHo
         public TextView name, phone;
         public ImageView thumbnail;
         public TextView marks;
+        public CardView cardView ;
 
         public MyViewHolder(View view) {
             super(view);
             name = view.findViewById(R.id.name);
             thumbnail = view.findViewById(R.id.thumbnail);
             marks = view.findViewById(R.id.mark);
+            cardView = view.findViewById(R.id.cardview_id);
 
 
             view.setOnClickListener(new View.OnClickListener() {
