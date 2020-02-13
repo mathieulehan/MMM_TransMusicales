@@ -6,6 +6,12 @@
     app:startDestination="@+id/nav_home">
 
     <fragment
+        android:id="@+id/nav_artists"
+        android:name="com.example.transmusicales.ui.artists.ArtistFragment"
+        android:label="@string/menu_artists"
+        tools:layout="@layout/fragment_artists" />
+
+    <fragment
         android:id="@+id/nav_home"
         android:name="com.example.transmusicales.ui.home.HomeFragment"
         android:label="@string/menu_home"
