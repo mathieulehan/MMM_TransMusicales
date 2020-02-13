@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,8 +26,6 @@ import java.util.List;
 
 public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAdapterListener{
 
-    private ArtistViewModel artistViewModel;
-
     // Firebase reference
     private FirebaseDatabase mFireDataBase;
     private DatabaseReference mArtistsDatabaseReference;
@@ -37,8 +36,17 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
     //STEP 4: child event lister.
     private ChildEventListener mChildEventListener;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        artists = new ArrayList<>();
+        artists.add(new Artist());
+        artists.add(new Artist());
+    }
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+
         View root = inflater.inflate(R.layout.fragment_artists, container, false);
 
         // STEP 2 : access the DB...
@@ -112,5 +120,4 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
             mArtistsDatabaseReference.addChildEventListener(mChildEventListener);
         }
     }
-
 }
