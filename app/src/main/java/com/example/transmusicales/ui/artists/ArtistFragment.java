@@ -62,6 +62,8 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
 
         // STEP 2.3: create and set the adapter
         artists = new ArrayList<>();
+        artists.add(new Artist("toto", null, 4));
+        artists.add(new Artist("toto2", null, 3));
         mAdapter = new ArtistsAdapter(getContext(), artists, this);
         recyclerView.setAdapter(mAdapter);
 
@@ -77,7 +79,7 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
 
         // STEP 6.1: Updating the field in the class
         // TODO mettre la note donnée par l'utilisateur en calculant la motenne
-        artist.getFields().setMark("6.04");
+        artist.setMark(4);
 
         // STEP 6.2: Updating the field on the Firebase DB
         mArtistsDatabaseReference.child(artist.getUid()).child("mark").setValue(artist.getFields().getMark());

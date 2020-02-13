@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,16 +28,16 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.MyViewHo
     private ArtistsAdapterListener listener;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView name, phone;
+        public TextView name;
         public ImageView thumbnail;
-        public TextView marks;
+        public RatingBar mark;
         public CardView cardView ;
 
         public MyViewHolder(View view) {
             super(view);
             name = view.findViewById(R.id.name);
             thumbnail = view.findViewById(R.id.thumbnail);
-            marks = view.findViewById(R.id.mark);
+            mark = view.findViewById(R.id.mark);
             cardView = view.findViewById(R.id.cardview_id);
 
 

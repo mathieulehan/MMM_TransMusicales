@@ -25,8 +25,10 @@ public class Artist {
         return datasetid;
     }
 
-    public String getRecordid() {
-        return recordid;
+    public Artist(String name, String image, double mark) {
+        this.name = name;
+        this.image = image;
+        this.mark = mark;
     }
 
     public Fields getFields() {
