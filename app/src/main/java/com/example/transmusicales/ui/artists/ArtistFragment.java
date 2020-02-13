@@ -4,14 +4,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,6 +15,8 @@ import com.example.transmusicales.Artist;
 import com.example.transmusicales.ArtistsAdapter;
 import com.example.transmusicales.R;
 import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -31,7 +29,7 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
 
     // Firebase reference
     private FirebaseDatabase mFireDataBase;
-    private DatabaseReference mContactsDatabaseReference;
+    private DatabaseReference mArtistsDatabaseReference;
     private RecyclerView recyclerView;
     private ArtistsAdapter mAdapter;
     private SearchView searchView;
@@ -41,20 +39,13 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        artistViewModel = ViewModelProviders.of(this).get(ArtistViewModel.class);
         View root = inflater.inflate(R.layout.fragment_artists, container, false);
-        final TextView textView = root.findViewById(R.id.text_artist);
-        artistViewModel.getText().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+
         // STEP 2 : access the DB...
         mFireDataBase = FirebaseDatabase.getInstance();
 
-        // STEP 2.1: and from the DB, get a reference on the child node "artists"
-        mContactsDatabaseReference = mFireDataBase.getReference().child("transmusicales-7f9d8");
+        // STEP 2.1: and from the DB, get a reference
+        mArtistsDatabaseReference = mFireDataBase.getReference();
 
         // STEP 2.2: get the recycler view
         recyclerView = root.findViewById(R.id.recycler_view);
@@ -65,6 +56,10 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
         artists = new ArrayList<>();
         mAdapter = new ArtistsAdapter(getContext(), artists, this);
         recyclerView.setAdapter(mAdapter);
+
+        // STEP 4: listen to any change on the DB
+        enableUpdatesFromDB();
+
         return root;
     }
 
@@ -74,10 +69,48 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
 
         // STEP 6.1: Updating the field in the class
         // TODO mettre la note donnée par l'utilisateur en calculant la motenne
-        artist.setMark(6.04);
+        artist.getFields().setMark("6.04");
 
         // STEP 6.2: Updating the field on the Firebase DB
-        mContactsDatabaseReference.child(artist.getUid()).child("mark").setValue(artist.getMark());
+        mArtistsDatabaseReference.child(artist.getUid()).child("mark").setValue(artist.getFields().getMark());
 
     }
+
+    // STEP 4: listen to any change on the DB
+    public void enableUpdatesFromDB() {
+        if (mChildEventListener == null) {
+            mChildEventListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    Artist artist = dataSnapshot.getValue(Artist.class);
+                    // don't forget to set the key to identify the Artist!
+                    artist.setUid(dataSnapshot.getKey());
+                    artists.add(artist);
+                    mAdapter.notifyDataSetChanged();
+                }
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    Artist artist = dataSnapshot.getValue(Artist.class);
+                    artist.setUid(dataSnapshot.getKey());
+                    mAdapter.updateArtist(artist);
+                    mAdapter.notifyDataSetChanged();
+                }
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    //Artist msg = dataSnapshot.getValue(Artist.class);
+                    // don't forget to set the key to identify the Artist!
+                    mAdapter.removeArtistWithId(dataSnapshot.getKey());
+                    mAdapter.notifyDataSetChanged();
+                }
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            };
+            mArtistsDatabaseReference.addChildEventListener(mChildEventListener);
+        }
+    }
+
 }

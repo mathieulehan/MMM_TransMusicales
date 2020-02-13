@@ -12,9 +12,6 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,24 +65,12 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.MyViewHo
     public void onBindViewHolder(MyViewHolder viewHolder, final int position) {
         final Artist artist = artistListFiltered.get(position);
 
-        if (artist.getName() != null) {
-            viewHolder.name.setText(artist.getName());
+        if (artist.getFields().getArtistes() != null) {
+            viewHolder.name.setText(artist.getFields().getArtistes());
             viewHolder.phone.setVisibility(TextView.VISIBLE);
             viewHolder.thumbnail.setVisibility(ImageView.GONE);
         }
-        if (artist.getImage() != null) {
-            String imageUrl = artist.getImage();
-            Log.i("TAG","image="+imageUrl);
-            Glide.with(viewHolder.thumbnail.getContext())
-                    .load(artist.getImage())
-                    .apply(RequestOptions.circleCropTransform())
-                    .into(viewHolder.thumbnail);
-
-            viewHolder.thumbnail.setVisibility(ImageView.VISIBLE);
-            viewHolder.phone.setVisibility(TextView.GONE);
-        }
-
-        viewHolder.marks.setText(""+artist.getMark());
+        viewHolder.marks.setText(artist.getFields().getMark());
     }
 
     @Override
@@ -107,7 +92,7 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.MyViewHo
                 .orElse(null);
         if (oldArtist != null) {
             artistListFiltered.set(artistListFiltered.indexOf(oldArtist), updatedArtist);
-            Log.i("TAG","updated mark from DB for "+updatedArtist+" = "+ updatedArtist.getMark());
+            Log.i("TAG","updated mark from DB for "+updatedArtist+" = "+ updatedArtist.getFields().getMark());
         }
 
         oldArtist = artistList.stream()
@@ -134,7 +119,7 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.MyViewHo
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match
-                        if (row.getName().toLowerCase().contains(charString.toLowerCase())) {
+                        if (row.getFields().getArtistes().toLowerCase().contains(charString.toLowerCase())) {
                             filteredList.add(row);
                         }
                     }
