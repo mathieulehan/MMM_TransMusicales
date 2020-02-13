@@ -1,29 +1,30 @@
 package com.example.transmusicales;
 
 import android.os.Bundle;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
+import android.view.Menu;
 import android.view.View;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
-import androidx.drawerlayout.widget.DrawerLayout;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
-import android.view.Menu;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ArtistsAdapter.ArtistsAdapterListener {
 
     private AppBarConfiguration mAppBarConfiguration;
+
+    // Firebase reference
+    private FirebaseDatabase mFireDataBase;
+    private DatabaseReference mContactsDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +52,12 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        // STEP 2 : access the DB...
+        mFireDataBase = FirebaseDatabase.getInstance();
+
+        // STEP 2.1: and from the DB, get a reference on the child node "contacts"
+        mContactsDatabaseReference = mFireDataBase.getReference().child("artists");
     }
 
     @Override
@@ -65,5 +72,18 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    // Updating an artist
+    @Override
+    public void onArtistSelected(Artist artist) {
+
+        // STEP 6.1: Updating the field in the class
+        // TODO mettre la note donnée par l'utilisateur en calculant la motenne
+        artist.setMark(6.04);
+
+        // STEP 6.2: Updating the field on the Firebase DB
+        mContactsDatabaseReference.child(artist.getUid()).child("mark").setValue(artist.getMark());
+
     }
 }
