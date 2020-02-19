@@ -4,6 +4,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,11 +19,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.transmusicales.Artist;
 import com.example.transmusicales.ArtistsAdapter;
 import com.example.transmusicales.R;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -31,18 +38,19 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
     private FirebaseDatabase mFireDataBase;
     private DatabaseReference mArtistsDatabaseReference;
     private RecyclerView recyclerView;
-    private ArtistsAdapter mAdapter;
+    private FirebaseRecyclerAdapter  mAdapter;
     private SearchView searchView;
     List<Artist> artists;
     //STEP 4: child event lister.
     private ChildEventListener mChildEventListener;
+    int pastVisiblesItems, visibleItemCount, totalItemCount;
+    boolean userScrolled=false;
+    private boolean loading = true;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         artists = new ArrayList<>();
-//        artists.add(new Artist());
-  //      artists.add(new Artist());
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -59,30 +67,64 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
         mArtistsDatabaseReference = mFireDataBase.getReference().child("artistes");
 
         mArtistsDatabaseReference.addValueEventListener(new ValueEventListener() {
-                                                            @Override
-                                                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                                                ArrayList<Artist> a = (ArrayList<Artist>) dataSnapshot.getValue();
-                                                                for (Artist newArtist: a) {
-                                                                    artists.add(newArtist);
-                                                                }
-                                                            }
+            @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                artists.clear();
+                    for (DataSnapshot artist : dataSnapshot.getChildren()) {
+                        Artist newArtist = artist.getValue(Artist.class);
+                        artists.add(newArtist);
+                    }
+                }
 
-                                                            @Override
-                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                System.out.println("The read failed: " + databaseError.getCode());
-                                                            }
-                                                        });
-                                                            // STEP 2.2: get the recycler view
-        recyclerView = root.findViewById(R.id.recycler_view);
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+
+        // STEP 2.2: get the recycler view
+        recyclerView = root.findViewById(R.id.list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayoutManager);
-
+        recyclerView.setHasFixedSize(true);
+        fetch();
         // STEP 2.3: create and set the adapter
-        mAdapter = new ArtistsAdapter(getContext(), artists, this);
         recyclerView.setAdapter(mAdapter);
-
+        mAdapter.startListening();
         // STEP 4: listen to any change on the DB
         enableUpdatesFromDB();
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                // Here get the child count, item count and visibleitems
+                // from layout manager
+
+                visibleItemCount = linearLayoutManager.getChildCount();
+                totalItemCount = linearLayoutManager.getItemCount();
+                pastVisiblesItems = linearLayoutManager
+                        .findFirstVisibleItemPosition();
+
+                // Now check if userScrolled is true and also check if
+                // the item is end then update recycler view and set
+                // userScrolled to false
+                if (userScrolled && (visibleItemCount + pastVisiblesItems) == totalItemCount) {
+                    userScrolled = false;
+                }
+            }
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+
+                super.onScrollStateChanged(recyclerView, newState);
+
+                // If scroll state is touch scroll then set userScrolled
+                // true
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    userScrolled = true;
+                }
+            }
+        });
 
         return root;
     }
@@ -116,14 +158,14 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                     Artist artist = dataSnapshot.getValue(Artist.class);
                     artist.setUid(dataSnapshot.getKey());
-                    mAdapter.updateArtist(artist);
+                    //mAdapter.updateArtist(artist);
                     mAdapter.notifyDataSetChanged();
                 }
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
                     //Artist msg = dataSnapshot.getValue(Artist.class);
                     // don't forget to set the key to identify the Artist!
-                    mAdapter.removeArtistWithId(dataSnapshot.getKey());
+                    //mAdapter.removeArtistWithId(dataSnapshot.getKey());
                     mAdapter.notifyDataSetChanged();
                 }
                 @Override
@@ -134,6 +176,54 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
                 }
             };
             mArtistsDatabaseReference.addChildEventListener(mChildEventListener);
+        }
+    }
+
+    private void fetch() {
+
+        Query query = FirebaseDatabase.getInstance()
+                .getReference()
+                .child("artistes");
+
+        FirebaseRecyclerOptions<Artist> options =
+                new FirebaseRecyclerOptions.Builder<Artist>()
+                        .setQuery(query, snapshot -> snapshot.getValue(Artist.class))
+                        .build();
+
+        mAdapter = new FirebaseRecyclerAdapter<Artist, ViewHolder>(options) {
+
+            @Override
+            public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.fragment_artists, parent, false);
+
+                return new ViewHolder(view);
+            }
+
+
+            @Override
+            protected void onBindViewHolder(@NonNull ViewHolder holder, final int position, Artist model) {
+                holder.setTxtTitle(model.getFields().getArtistes());
+
+                holder.root.setOnClickListener((View.OnClickListener) view -> Toast.makeText(getContext(), String.valueOf(position), Toast.LENGTH_SHORT).show());
+            }
+
+        };
+        recyclerView.setAdapter(mAdapter);
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public LinearLayout root;
+        public TextView txtTitle;
+        public TextView txtDesc;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+        root = itemView.findViewById(R.id.list_root);
+        txtTitle = itemView.findViewById(R.id.artiste_name);
+        }
+        public void setTxtTitle(String string) {
+            txtTitle.setText(string);
         }
     }
 }

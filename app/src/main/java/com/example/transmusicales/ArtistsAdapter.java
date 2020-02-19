@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.MyViewHolder> implements Filterable {
-    private Context context;
     List<Artist> artistList;
     List<Artist> artistListFiltered;
     private ArtistsAdapterListener listener;
@@ -30,7 +29,7 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.MyViewHo
 
         public MyViewHolder(View view) {
             super(view);
-            name = view.findViewById(R.id.name);
+            name = view.findViewById(R.id.artiste_name);
             thumbnail = view.findViewById(R.id.thumbnail);
             mark = view.findViewById(R.id.mark);
             cardView = view.findViewById(R.id.cardview_id);
@@ -49,7 +48,6 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.MyViewHo
 
 
     public ArtistsAdapter(Context context, List<Artist> artistList, ArtistsAdapterListener listener) {
-        this.context = context;
         this.listener = listener;
         this.artistList = artistList;
         this.artistListFiltered = artistList;
@@ -65,14 +63,14 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(MyViewHolder viewHolder, final int position) {
-        final Artist artist = artistListFiltered.get(position);
-
-/*        if (artist.getFields().getArtistes() != null) {
+        if (artistListFiltered.get(position) != null) {
+            final Artist artist = artistListFiltered.get(position);
+            if (artist.getFields().getArtistes() != null) {
             viewHolder.name.setText(artist.getFields().getArtistes());
-            viewHolder.phone.setVisibility(TextView.VISIBLE);
             viewHolder.thumbnail.setVisibility(ImageView.GONE);
         }
-        viewHolder.marks.setText(artist.getFields().getMark());*/
+        viewHolder.mark.setRating(Float.parseFloat(artist.getFields().getMark()));
+        }
     }
 
     @Override
