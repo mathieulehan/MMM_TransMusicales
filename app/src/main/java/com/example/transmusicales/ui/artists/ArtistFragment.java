@@ -84,12 +84,12 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
 
         // STEP 2.2: get the recycler view
         recyclerView = root.findViewById(R.id.list);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(recyclerView.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setHasFixedSize(true);
-        fetch();
         // STEP 2.3: create and set the adapter
         recyclerView.setAdapter(mAdapter);
+        fetch();
+        recyclerView.setHasFixedSize(true);
         mAdapter.startListening();
         // STEP 4: listen to any change on the DB
         enableUpdatesFromDB();
@@ -127,6 +127,18 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
         });
 
         return root;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAdapter.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mAdapter.stopListening();
     }
 
     // Updating an artist
@@ -187,7 +199,7 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
 
         FirebaseRecyclerOptions<Artist> options =
                 new FirebaseRecyclerOptions.Builder<Artist>()
-                        .setQuery(query, snapshot -> snapshot.getValue(Artist.class))
+                        .setQuery(query, Artist.class)
                         .build();
 
         mAdapter = new FirebaseRecyclerAdapter<Artist, ViewHolder>(options) {
@@ -205,7 +217,17 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
             protected void onBindViewHolder(@NonNull ViewHolder holder, final int position, Artist model) {
                 holder.setTxtTitle(model.getFields().getArtistes());
 
-                holder.root.setOnClickListener((View.OnClickListener) view -> Toast.makeText(getContext(), String.valueOf(position), Toast.LENGTH_SHORT).show());
+                if (holder.root != null ) holder.root.setOnClickListener(view -> Toast.makeText(getContext(), String.valueOf(position), Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onDataChanged() {
+                System.out.println("Data changed");
+            }
+
+            @Override
+            public void onError(@NonNull DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
             }
 
         };
@@ -223,7 +245,8 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
         txtTitle = itemView.findViewById(R.id.artiste_name);
         }
         public void setTxtTitle(String string) {
-            txtTitle.setText(string);
+            txtTitle = itemView.findViewById(R.id.artiste_name);
+            if (txtTitle != null) txtTitle.setText(string);
         }
     }
 }
