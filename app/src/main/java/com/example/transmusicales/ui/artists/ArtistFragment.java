@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,7 +43,7 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
     //STEP 4: child event lister.
     private ChildEventListener mChildEventListener;
     int pastVisiblesItems, visibleItemCount, totalItemCount;
-    boolean userScrolled=false;
+    boolean userScrolled = false;
     private boolean loading = true;
 
     @Override
@@ -212,14 +211,6 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
                 return new ViewHolder(view);
             }
 
-
-            @Override
-            protected void onBindViewHolder(@NonNull ViewHolder holder, final int position, Artist model) {
-                holder.setTxtTitle(model.getFields().getArtistes());
-
-                if (holder.root != null ) holder.root.setOnClickListener(view -> Toast.makeText(getContext(), String.valueOf(position), Toast.LENGTH_SHORT).show());
-            }
-
             @Override
             public void onDataChanged() {
                 System.out.println("Data changed");
@@ -230,23 +221,31 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
                 System.out.println("The read failed: " + databaseError.getCode());
             }
 
+            /**
+             * @param holder
+             * @param position
+             * @param artist    the model object containing the data that should be used to populate the view.
+             */
+            @Override
+            protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull Artist artist) {
+                holder.setArtist(artist);
+            }
         };
         recyclerView.setAdapter(mAdapter);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public LinearLayout root;
-        public TextView txtTitle;
-        public TextView txtDesc;
+        private final TextView artistName;
 
         public ViewHolder(View itemView) {
             super(itemView);
         root = itemView.findViewById(R.id.list_root);
-        txtTitle = itemView.findViewById(R.id.artiste_name);
+        artistName = itemView.findViewById(R.id.text_artist);
         }
-        public void setTxtTitle(String string) {
-            txtTitle = itemView.findViewById(R.id.artiste_name);
-            if (txtTitle != null) txtTitle.setText(string);
+
+        public void setArtist(Artist artist) {
+            artistName.setText(artist.getFields().getArtistes());
         }
     }
 }
