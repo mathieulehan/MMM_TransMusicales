@@ -1,5 +1,7 @@
 package com.example.transmusicales;
 
+import androidx.annotation.NonNull;
+
 public class Artist {
     private String datasetid;
     private String recordid;
@@ -96,5 +98,20 @@ public class Artist {
 
     public String getMark(){
         return this.getFields().getMark();
+    }
+
+    @NonNull
+    public String toString() {
+        return "Nom : " + this.fields.getArtistes() +
+                "\nNombre de personnes : " + this.getNbPersonne() +
+                "\nNote moyenne : " + this.getMark() +
+                "\nSpotify : " + this.fields.getSpotify() +
+                "\nDeezer : " + this.fields.getDeezer() +
+                "\nAnnée : " + this.fields.getAnnee() +
+                "\nLangue : " + this.fields.getCou_official_lang_code() +
+                "\nOrigine (pays) : " + this.fields.getOrigine_pays1() +
+                "\nOrigine (ville) : " + this.fields.getOrigine_ville1() +
+                "\nPremière date : " + this.fields.getPremiere_date() +
+                "\nNom du spectacle / de la soirée : " + this.fields.getNom_spectacle_ou_soiree();
     }
 }

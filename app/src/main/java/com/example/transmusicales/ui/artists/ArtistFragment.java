@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.transmusicales.Artist;
-import com.example.transmusicales.Fields;
 import com.example.transmusicales.R;
 import com.firebase.ui.database.paging.DatabasePagingOptions;
 import com.firebase.ui.database.paging.FirebaseRecyclerPagingAdapter;
@@ -108,6 +107,16 @@ public class ArtistFragment extends Fragment{
                                                     @NonNull Artist artiste) {
                         holder.setArtist(artiste);
                         //holder.onUpdateMark(artiste,mArtisteDatabaseReference);
+                        holder.root.setOnClickListener(new View.OnClickListener() {
+                             @Override
+                             public void onClick(View v) {
+                                 Dialog d = new Dialog(root.getContext());
+                                 d.setContentView(R.layout.selected_artist_info);
+                                 TextView artistInfos = d.findViewById(R.id.infos);
+                                 artistInfos.setText(artiste.toString());
+                                 d.show();
+                             }
+                         });
                     }
 
                     @Override
@@ -247,14 +256,6 @@ public class ArtistFragment extends Fragment{
             artistName = itemView.findViewById(R.id.artiste_name);
             artisteMark = itemView.findViewById(R.id.mark);
             artistePremiereSalle = itemView.findViewById(R.id.premiere_salle);
-
-            // Listens to a click on an artist
-            root.setOnClickListener(itemView2 -> {
-                Dialog d = new Dialog(root.getContext());
-                d.setTitle(artistName.getText());
-                d.setContentView(R.layout.artist_info);
-                d.show();
-            });
         }
 
         void setArtist(Artist artist) {
@@ -277,6 +278,5 @@ public class ArtistFragment extends Fragment{
                 }
             });
         }
-
     }
 }
