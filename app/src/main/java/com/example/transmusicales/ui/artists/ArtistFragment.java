@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.transmusicales.Artist;
+import com.example.transmusicales.Fields;
 import com.example.transmusicales.R;
 import com.firebase.ui.database.paging.DatabasePagingOptions;
 import com.firebase.ui.database.paging.FirebaseRecyclerPagingAdapter;
@@ -27,16 +28,19 @@ import com.firebase.ui.database.paging.LoadingState;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArtistFragment extends Fragment {
+
+public class ArtistFragment extends Fragment{
 
     // Firebase reference
     private FirebaseDatabase mFireDataBase;
+    private DatabaseReference mArtisteDatabaseReference;
     private RecyclerView recyclerView;
     private SearchView searchView;
     List<Artist> artists;
@@ -66,6 +70,8 @@ public class ArtistFragment extends Fragment {
 
         // STEP 2.1: and from the DB, get a reference
         Query baseQuery = mFireDataBase.getReference().child("artistes");
+
+        mArtisteDatabaseReference = mFireDataBase.getReference().child("artistes");
 
         // This configuration comes from the Paging Support Library
         // https://developer.android.com/reference/android/arch/paging/PagedList.Config.html
@@ -101,6 +107,7 @@ public class ArtistFragment extends Fragment {
                                                     int position,
                                                     @NonNull Artist artiste) {
                         holder.setArtist(artiste);
+                        //holder.onUpdateMark(artiste,mArtisteDatabaseReference);
                     }
 
                     @Override
@@ -255,5 +262,21 @@ public class ArtistFragment extends Fragment {
             artisteMark.setRating(Float.parseFloat(artist.fields.getMark()));
             artistePremiereSalle.setText(artist.getFields().getPremiere_salle().trim());
         }
+
+        public void onUpdateMark(Artist artist, DatabaseReference mArtisteDatabaseReference) {
+            RatingBar myMarkStar = artisteMark;
+            myMarkStar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+                @Override
+                public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+
+                    artist.setNbPersonne(Integer.parseInt(artist.getNbPersonne())+1);
+                    artist.setMark(rating);
+
+                    mArtisteDatabaseReference.child(artist.getUid()).child("field").child("mark").setValue(artist.getMark());
+                    mArtisteDatabaseReference.child(artist.getUid()).child("field").child("nbpersonne").setValue(artist.getNbPersonne());
+                }
+            });
+        }
+
     }
 }
