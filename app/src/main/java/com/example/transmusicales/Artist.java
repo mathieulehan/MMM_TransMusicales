@@ -40,6 +40,11 @@ public class Artist {
         this.geometry = geometry;
     }
 
+    public Artist(String uid, Fields fields) {
+        this.uid = uid;
+        this.fields = fields;
+    }
+
     public String getRecord_timestamp() {
         return record_timestamp;
     }
@@ -71,5 +76,25 @@ public class Artist {
 
     public void setGeometry(Geometry geometry) {
         this.geometry = geometry;
+    }
+
+    public String getNbPersonne() {
+        return this.getFields().getNbpersonne();
+    }
+
+    public void setNbPersonne(Integer nbPersonne){
+        Fields f = this.getFields();
+        f.setNbpersonne(String.valueOf(nbPersonne));
+        this.setFields(f);
+    }
+
+    public void setMark(float rating) {
+        Fields f = this.getFields();
+        f.setMark(String.valueOf(rating));
+        this.setFields(f);
+    }
+
+    public String getMark(){
+        return this.getFields().getMark();
     }
 }
