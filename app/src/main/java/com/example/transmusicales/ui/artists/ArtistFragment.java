@@ -13,20 +13,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
+import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.transmusicales.Artist;
 import com.example.transmusicales.R;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.firebase.ui.database.paging.DatabasePagingOptions;
+import com.firebase.ui.database.paging.FirebaseRecyclerPagingAdapter;
+import com.firebase.ui.database.paging.LoadingState;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,12 +36,12 @@ public class ArtistFragment extends Fragment {
 
     // Firebase reference
     private FirebaseDatabase mFireDataBase;
-    private DatabaseReference mArtistsDatabaseReference;
     private RecyclerView recyclerView;
-    private FirebaseRecyclerAdapter  mAdapter;
     private SearchView searchView;
     List<Artist> artists;
     //STEP 4: child event lister.
+    private FirebaseRecyclerPagingAdapter<Artist, ViewHolder> mAdapter;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private ChildEventListener mChildEventListener;
     int pastVisiblesItems, visibleItemCount, totalItemCount;
     boolean userScrolled = false;
@@ -63,31 +64,85 @@ public class ArtistFragment extends Fragment {
         mFireDataBase = FirebaseDatabase.getInstance();
 
         // STEP 2.1: and from the DB, get a reference
-        mArtistsDatabaseReference = mFireDataBase.getReference().child("artistes");
+        Query baseQuery = mFireDataBase.getReference().child("artistes");
 
-        mArtistsDatabaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                artists.clear();
-                    for (DataSnapshot artist : dataSnapshot.getChildren()) {
-                        Artist newArtist = artist.getValue(Artist.class);
-                        artists.add(newArtist);
-                    }
-                }
+        // This configuration comes from the Paging Support Library
+        // https://developer.android.com/reference/android/arch/paging/PagedList.Config.html
+        PagedList.Config config = new PagedList.Config.Builder()
+                .setEnablePlaceholders(false)
+                .setPrefetchDistance(10)
+                .setPageSize(20)
+                .build();
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
-            }
-        });
+        // The options for the adapter combine the paging configuration with query information
+        // and application-specific options for lifecycle, etc.
+        DatabasePagingOptions<Artist> options = new DatabasePagingOptions.Builder<Artist>()
+                .setLifecycleOwner(this)
+                .setQuery(baseQuery, config, Artist.class)
+                .build();
 
         // STEP 2.2: get the recycler view
         recyclerView = root.findViewById(R.id.list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(recyclerView.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
+        mSwipeRefreshLayout = root.findViewById(R.id.swipe_refresh_layout);
+
+        mAdapter =
+                new FirebaseRecyclerPagingAdapter<Artist, ViewHolder>(options) {
+                    @NonNull
+                    @Override
+                    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.artist_item, parent, false));
+                    }
+
+                    @Override
+                    protected void onBindViewHolder(@NonNull ViewHolder holder,
+                                                    int position,
+                                                    @NonNull Artist artiste) {
+                        holder.setArtist(artiste);
+                    }
+
+                    @Override
+                    protected void onError(@NonNull DatabaseError databaseError) {
+                        mSwipeRefreshLayout.setRefreshing(false);
+                        databaseError.toException().printStackTrace();
+                        // Handle Error
+
+                    }
+
+                    /**
+                     * Called whenever the loading state of the adapter changes.
+                     * <p>
+                     * When the state is {@link LoadingState#ERROR} the adapter will stop loading any data
+                     *
+                     * @param state
+                     */
+                    @Override
+                    protected void onLoadingStateChanged(@NonNull LoadingState state) {
+                        mSwipeRefreshLayout = root.findViewById(R.id.swipe_refresh_layout);
+                        switch (state) {
+                            case LOADING_INITIAL:
+                            case LOADING_MORE:
+                                // Do your loading animation
+                                mSwipeRefreshLayout.setRefreshing(true);
+                                break;
+
+                            case LOADED:
+                            case FINISHED:
+                                //Reached end of Data set
+                                // Stop Animation
+                                mSwipeRefreshLayout.setRefreshing(false);
+                                break;
+
+                            case ERROR:
+                                retry();
+                                break;
+                        }
+                    }
+                };
+
         // STEP 2.3: create and set the adapter
         recyclerView.setAdapter(mAdapter);
-        fetch();
         recyclerView.setHasFixedSize(true);
         mAdapter.startListening();
         // STEP 4: listen to any change on the DB
@@ -169,52 +224,7 @@ public class ArtistFragment extends Fragment {
                 public void onCancelled(DatabaseError databaseError) {
                 }
             };
-            mArtistsDatabaseReference.addChildEventListener(mChildEventListener);
         }
-    }
-
-    private void fetch() {
-
-        Query query = FirebaseDatabase.getInstance()
-                .getReference()
-                .child("artistes");
-
-        FirebaseRecyclerOptions<Artist> options =
-                new FirebaseRecyclerOptions.Builder<Artist>()
-                        .setQuery(query, Artist.class)
-                        .build();
-
-        mAdapter = new FirebaseRecyclerAdapter<Artist, ViewHolder>(options) {
-
-            @Override
-            public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.artist_item, parent, false);
-
-                return new ViewHolder(view);
-            }
-
-            @Override
-            public void onDataChanged() {
-                System.out.println("Data changed");
-            }
-
-            @Override
-            public void onError(@NonNull DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
-            }
-
-            /**
-             * @param holder
-             * @param position
-             * @param artist    the model object containing the data that should be used to populate the view.
-             */
-            @Override
-            protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull Artist artist) {
-                holder.setArtist(artist);
-            }
-        };
-        recyclerView.setAdapter(mAdapter);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
