@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -206,7 +207,7 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
             @Override
             public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 View view = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.fragment_artists, parent, false);
+                        .inflate(R.layout.artist_item, parent, false);
 
                 return new ViewHolder(view);
             }
@@ -234,18 +235,21 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
         recyclerView.setAdapter(mAdapter);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public LinearLayout root;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        LinearLayout root;
         private final TextView artistName;
+        private final RatingBar artisteMark;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
         root = itemView.findViewById(R.id.list_root);
-        artistName = itemView.findViewById(R.id.text_artist);
+        artistName = itemView.findViewById(R.id.artiste_name);
+        artisteMark = itemView.findViewById(R.id.mark);
         }
 
-        public void setArtist(Artist artist) {
+        void setArtist(Artist artist) {
             artistName.setText(artist.getFields().getArtistes());
+            artisteMark.setRating(1);
         }
     }
 }
