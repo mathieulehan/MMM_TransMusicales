@@ -107,7 +107,7 @@ public class ArtistFragment extends Fragment{
                                                     @NonNull Artist artiste) {
                         holder.setArtist(artiste);
                         //holder.onUpdateMark(artiste,mArtisteDatabaseReference);
-                        holder.root.setOnClickListener(new View.OnClickListener() {
+                        holder.itemView.setOnClickListener(new View.OnClickListener() {
                              @Override
                              public void onClick(View v) {
                                  Dialog d = new Dialog(root.getContext());
