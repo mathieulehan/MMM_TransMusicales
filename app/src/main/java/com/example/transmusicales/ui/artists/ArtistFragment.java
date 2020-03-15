@@ -1,5 +1,6 @@
 package com.example.transmusicales.ui.artists;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -229,19 +230,30 @@ public class ArtistFragment extends Fragment {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout root;
-        private final TextView artistName;
-        private final RatingBar artisteMark;
+        private TextView artistName;
+        private RatingBar artisteMark;
+        private TextView artistePremiereSalle;
 
         ViewHolder(View itemView) {
             super(itemView);
-        root = itemView.findViewById(R.id.list_root);
-        artistName = itemView.findViewById(R.id.artiste_name);
-        artisteMark = itemView.findViewById(R.id.mark);
+            root = itemView.findViewById(R.id.list_root);
+            artistName = itemView.findViewById(R.id.artiste_name);
+            artisteMark = itemView.findViewById(R.id.mark);
+            artistePremiereSalle = itemView.findViewById(R.id.premiere_salle);
+
+            // Listens to a click on an artist
+            root.setOnClickListener(itemView2 -> {
+                Dialog d = new Dialog(root.getContext());
+                d.setTitle(artistName.getText());
+                d.setContentView(R.layout.artist_info);
+                d.show();
+            });
         }
 
         void setArtist(Artist artist) {
-            artistName.setText(artist.getFields().getArtistes());
+            artistName.setText(artist.getFields().getArtistes().trim());
             artisteMark.setRating(Float.parseFloat(artist.fields.getMark()));
+            artistePremiereSalle.setText(artist.getFields().getPremiere_salle().trim());
         }
     }
 }
