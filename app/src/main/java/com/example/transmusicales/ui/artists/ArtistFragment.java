@@ -249,7 +249,7 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
 
         void setArtist(Artist artist) {
             artistName.setText(artist.getFields().getArtistes());
-            artisteMark.setRating(1);
+            artisteMark.setRating(Float.parseFloat(artist.fields.getMark()));
         }
     }
 }
