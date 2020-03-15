@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.transmusicales.Artist;
-import com.example.transmusicales.ArtistsAdapter;
 import com.example.transmusicales.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -32,7 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAdapterListener{
+public class ArtistFragment extends Fragment {
 
     // Firebase reference
     private FirebaseDatabase mFireDataBase;
@@ -141,19 +140,6 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
         mAdapter.stopListening();
     }
 
-    // Updating an artist
-    @Override
-    public void onArtistSelected(Artist artist) {
-
-        // STEP 6.1: Updating the field in the class
-        // TODO mettre la note donnée par l'utilisateur en calculant la motenne
-       /* artist.getFields().setMark("6.04");
-
-        // STEP 6.2: Updating the field on the Firebase DB
-        mArtistsDatabaseReference.child(artist.getUid()).child("mark").setValue(artist.getFields().getMark());*/
-
-    }
-
     // STEP 4: listen to any change on the DB
     public void enableUpdatesFromDB() {
         if (mChildEventListener == null) {
@@ -170,14 +156,10 @@ public class ArtistFragment extends Fragment implements ArtistsAdapter.ArtistsAd
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                     Artist artist = dataSnapshot.getValue(Artist.class);
                     artist.setUid(dataSnapshot.getKey());
-                    //mAdapter.updateArtist(artist);
                     mAdapter.notifyDataSetChanged();
                 }
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
-                    //Artist msg = dataSnapshot.getValue(Artist.class);
-                    // don't forget to set the key to identify the Artist!
-                    //mAdapter.removeArtistWithId(dataSnapshot.getKey());
                     mAdapter.notifyDataSetChanged();
                 }
                 @Override
