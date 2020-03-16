@@ -42,11 +42,6 @@ public class Artist {
         this.geometry = geometry;
     }
 
-    public Artist(String uid, Fields fields) {
-        this.uid = uid;
-        this.fields = fields;
-    }
-
     public String getRecord_timestamp() {
         return record_timestamp;
     }
@@ -112,6 +107,7 @@ public class Artist {
                 "\nOrigine (pays) : " + this.fields.getOrigine_pays1() +
                 "\nOrigine (ville) : " + this.fields.getOrigine_ville1() +
                 "\nPremière date : " + this.fields.getPremiere_date() +
+                "\nUId : " + this.getUid() +
                 "\nNom du spectacle / de la soirée : " + this.fields.getNom_spectacle_ou_soiree();
     }
 }

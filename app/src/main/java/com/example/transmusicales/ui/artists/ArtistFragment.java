@@ -107,7 +107,6 @@ public class ArtistFragment extends Fragment{
                                                     int position,
                                                     @NonNull Artist artiste) {
                         holder.setArtist(artiste);
-                        //holder.onUpdateMark(artiste,mArtisteDatabaseReference);
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                              @Override
                              public void onClick(View v) {
@@ -118,6 +117,9 @@ public class ArtistFragment extends Fragment{
                                  d.show();
                              }
                          });
+                        artiste.setUid(mFireDataBase.getReference().child("artistes").push().getKey());
+                        System.out.println("Uid : "+artiste.getUid());
+                        holder.onUpdateMark(artiste,mArtisteDatabaseReference);
                     }
 
                     @Override
@@ -222,6 +224,7 @@ public class ArtistFragment extends Fragment{
                     Artist artist = dataSnapshot.getValue(Artist.class);
                     // don't forget to set the key to identify the Artist!
                     artist.setUid(dataSnapshot.getKey());
+
                     artists.add(artist);
                     mAdapter.notifyDataSetChanged();
                 }
@@ -288,7 +291,7 @@ public class ArtistFragment extends Fragment{
 
                     artist.setNbPersonne(Integer.parseInt(artist.getNbPersonne())+1);
                     artist.setMark(rating);
-
+                    System.out.println("Artiste : "+artist.getUid());
                     mArtisteDatabaseReference.child(artist.getUid()).child("field").child("mark").setValue(artist.getMark());
                     mArtisteDatabaseReference.child(artist.getUid()).child("field").child("nbpersonne").setValue(artist.getNbPersonne());
                 }
