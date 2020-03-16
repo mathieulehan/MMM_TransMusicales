@@ -1,7 +1,10 @@
 package com.example.transmusicales;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -49,5 +52,22 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    public void openSpotifyAlbum(View view) {
+        String url = "https://open.spotify.com/album/";
+        String album = view.getTag().toString();
+        album = album.replaceAll("spotify:album:", "");
+        url = url + album;
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
+    }
+
+    public void openDeezerAlbum(View view) {
+        String url = "https://www.deezer.com/fr/album/" + view.getTag().toString();
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
     }
 }

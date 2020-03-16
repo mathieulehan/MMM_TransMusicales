@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -249,6 +250,8 @@ public class ArtistFragment extends Fragment{
         private TextView artistName;
         private RatingBar artisteMark;
         private TextView artistePremiereSalle;
+        private ImageView artisteSpotify;
+        private ImageView artisteDeezer;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -256,12 +259,25 @@ public class ArtistFragment extends Fragment{
             artistName = itemView.findViewById(R.id.artiste_name);
             artisteMark = itemView.findViewById(R.id.mark);
             artistePremiereSalle = itemView.findViewById(R.id.premiere_salle);
+            artisteSpotify = itemView.findViewById(R.id.spotify);
+            artisteDeezer = itemView.findViewById(R.id.deezer);
         }
 
         void setArtist(Artist artist) {
             artistName.setText(artist.getFields().getArtistes().trim());
             artisteMark.setRating(Float.parseFloat(artist.fields.getMark()));
             artistePremiereSalle.setText(artist.getFields().getPremiere_salle().trim());
+            if (artist.getFields().getSpotify()!= null && !artist.getFields().getSpotify().isEmpty()) {
+                artisteSpotify.setVisibility(View.VISIBLE);
+                artisteSpotify.setTag(artist.getFields().getSpotify());
+            }
+            else { artisteSpotify.setVisibility(View.GONE); }
+
+            if (artist.getFields().getDeezer()!= null && !artist.getFields().getDeezer().isEmpty()) {
+                artisteDeezer.setVisibility(View.VISIBLE);
+                artisteDeezer.setTag(artist.getFields().getDeezer());
+            }
+            else { artisteDeezer.setVisibility(View.GONE); }
         }
 
         public void onUpdateMark(Artist artist, DatabaseReference mArtisteDatabaseReference) {
