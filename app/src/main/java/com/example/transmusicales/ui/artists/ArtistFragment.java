@@ -106,7 +106,6 @@ public class ArtistFragment extends Fragment{
                                                     int position,
                                                     @NonNull Artist artiste) {
                         holder.setArtist(artiste);
-                        //holder.onUpdateMark(artiste,mArtisteDatabaseReference);
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                              @Override
                              public void onClick(View v) {
@@ -117,7 +116,8 @@ public class ArtistFragment extends Fragment{
                                  d.show();
                              }
                          });
-                        System.out.println("Uid : "+artiste);
+                        artiste.setUid(mFireDataBase.getReference().child("artistes").push().getKey());
+                        System.out.println("Uid : "+artiste.getUid());
                         holder.onUpdateMark(artiste,mArtisteDatabaseReference);
                     }
 
