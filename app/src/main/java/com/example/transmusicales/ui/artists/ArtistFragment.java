@@ -255,6 +255,7 @@ public class ArtistFragment extends Fragment{
         private TextView artistePremiereSalle;
         private ImageView artisteSpotify;
         private ImageView artisteDeezer;
+        private ImageView artisteGMaps;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -264,6 +265,7 @@ public class ArtistFragment extends Fragment{
             artistePremiereSalle = itemView.findViewById(R.id.premiere_salle);
             artisteSpotify = itemView.findViewById(R.id.spotify);
             artisteDeezer = itemView.findViewById(R.id.deezer);
+            artisteGMaps = itemView.findViewById(R.id.gmaps);
         }
 
         void setArtist(Artist artist) {
@@ -281,6 +283,12 @@ public class ArtistFragment extends Fragment{
                 artisteDeezer.setTag(artist.getFields().getDeezer());
             }
             else { artisteDeezer.setVisibility(View.GONE); }
+
+            if (artist.getGeometry()!= null && artist.getGeometry().getCoordinates().get(0) != null && artist.getGeometry().getCoordinates().get(1) != null) {
+                artisteGMaps.setVisibility(View.VISIBLE);
+                artisteGMaps.setTag(artist.getGeometry().getCoordinates().get(0) + "," + artist.getGeometry().getCoordinates().get(1));
+            }
+            else { artisteGMaps.setVisibility(View.GONE); }
         }
 
         public void onUpdateMark(Artist artist, DatabaseReference mArtisteDatabaseReference) {

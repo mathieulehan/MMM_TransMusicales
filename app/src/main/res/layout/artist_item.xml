@@ -82,6 +82,21 @@
             android:visibility="gone"
             app:srcCompat="@drawable/ic_launcher_background" />
 
+        <ImageView
+            android:id="@+id/gmaps"
+            android:layout_width="67dp"
+            android:layout_height="69dp"
+            android:adjustViewBounds="false"
+            android:background="#000000"
+            android:baselineAligned="true"
+            android:clickable="true"
+            android:contentDescription="Google Maps"
+            android:focusable="true"
+            android:onClick="openGoogleMaps"
+            android:tag=""
+            android:visibility="gone"
+            app:srcCompat="@drawable/common_google_signin_btn_icon_dark" />
+
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
