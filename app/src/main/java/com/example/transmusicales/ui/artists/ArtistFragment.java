@@ -289,7 +289,7 @@ public class ArtistFragment extends Fragment{
 
             if (artist.getGeometry()!= null && artist.getGeometry().getCoordinates().get(0) != null && artist.getGeometry().getCoordinates().get(1) != null) {
                 artisteGMaps.setVisibility(View.VISIBLE);
-                artisteGMaps.setTag(artist.getGeometry().getCoordinates().get(0) + "," + artist.getGeometry().getCoordinates().get(1));
+                artisteGMaps.setTag(artist.getGeometry().getCoordinates().get(1) + "," + artist.getGeometry().getCoordinates().get(0));
             }
             else { artisteGMaps.setVisibility(View.GONE); }
         }
