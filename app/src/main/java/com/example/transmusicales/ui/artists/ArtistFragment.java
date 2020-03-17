@@ -300,12 +300,13 @@ public class ArtistFragment extends Fragment{
                 @Override
                 public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
 
-                    artist.setNbPersonne(Integer.parseInt(artist.getNbPersonne())+1);
-                    artist.setMark(rating);
-
-                    System.out.println("Artiste : "+artist.getMark());
-                    mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("mark").setValue(artist.getMark());
-                    mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("nbpersonne").setValue(artist.getNbPersonne());
+                    if(rating != 0.0){
+                        artist.setNbPersonne(Integer.parseInt(artist.getNbPersonne())+1);
+                        artist.setMark(rating);
+                        System.out.println("Artiste : "+artist.getMark());
+                        mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("mark").setValue(artist.getMark());
+                        mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("nbpersonne").setValue(artist.getNbPersonne());
+                    }
                 }
             });
         }
