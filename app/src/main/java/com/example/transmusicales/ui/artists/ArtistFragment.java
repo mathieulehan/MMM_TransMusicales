@@ -63,8 +63,6 @@ public class ArtistFragment extends Fragment{
 
         View root = inflater.inflate(R.layout.fragment_artists, container, false);
 
-        artists = new ArrayList<>();
-
         // STEP 2 : access the DB...
         mFireDataBase = FirebaseDatabase.getInstance();
 
@@ -106,6 +104,12 @@ public class ArtistFragment extends Fragment{
                     protected void onBindViewHolder(@NonNull ViewHolder holder,
                                                     int position,
                                                     @NonNull Artist artiste) {
+                        for (Artist a: artists) {
+                            if(artiste.getRecordid() == a.getRecordid()){
+                                artiste.setUid(a.getUid());
+                            }
+                        }
+
                         holder.setArtist(artiste);
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                              @Override
@@ -117,9 +121,8 @@ public class ArtistFragment extends Fragment{
                                  d.show();
                              }
                          });
-                        artiste.setUid(mFireDataBase.getReference().child("artistes").push().getKey());
-                        System.out.println("Uid : "+artiste.getUid());
-                        holder.onUpdateMark(artiste,mArtisteDatabaseReference);
+
+                        holder.onUpdateMark(artiste,mArtisteDatabaseReference, artists);
                     }
 
                     @Override
@@ -224,7 +227,6 @@ public class ArtistFragment extends Fragment{
                     Artist artist = dataSnapshot.getValue(Artist.class);
                     // don't forget to set the key to identify the Artist!
                     artist.setUid(dataSnapshot.getKey());
-
                     artists.add(artist);
                     mAdapter.notifyDataSetChanged();
                 }
@@ -245,6 +247,7 @@ public class ArtistFragment extends Fragment{
                 public void onCancelled(DatabaseError databaseError) {
                 }
             };
+            mArtisteDatabaseReference.addChildEventListener(mChildEventListener);
         }
     }
 
@@ -291,7 +294,7 @@ public class ArtistFragment extends Fragment{
             else { artisteGMaps.setVisibility(View.GONE); }
         }
 
-        public void onUpdateMark(Artist artist, DatabaseReference mArtisteDatabaseReference) {
+        public void onUpdateMark(Artist artist, DatabaseReference mArtisteDatabaseReference, List<Artist> artists) {
             RatingBar myMarkStar = artisteMark;
             myMarkStar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
                 @Override
@@ -299,9 +302,10 @@ public class ArtistFragment extends Fragment{
 
                     artist.setNbPersonne(Integer.parseInt(artist.getNbPersonne())+1);
                     artist.setMark(rating);
-                    System.out.println("Artiste : "+artist.getUid());
-                    mArtisteDatabaseReference.child(artist.getUid()).child("field").child("mark").setValue(artist.getMark());
-                    mArtisteDatabaseReference.child(artist.getUid()).child("field").child("nbpersonne").setValue(artist.getNbPersonne());
+
+                    System.out.println("Artiste : "+artist.getMark());
+                    mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("mark").setValue(artist.getMark());
+                    mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("nbpersonne").setValue(artist.getNbPersonne());
                 }
             });
         }
