@@ -259,6 +259,7 @@ public class ArtistFragment extends Fragment{
         private ImageView artisteSpotify;
         private ImageView artisteDeezer;
         private ImageView artisteGMaps;
+        private TextView artisteMoyenne;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -269,11 +270,13 @@ public class ArtistFragment extends Fragment{
             artisteSpotify = itemView.findViewById(R.id.spotify);
             artisteDeezer = itemView.findViewById(R.id.deezer);
             artisteGMaps = itemView.findViewById(R.id.gmaps);
+            artisteMoyenne = itemView.findViewById(R.id.avg);
         }
 
         void setArtist(Artist artist) {
             artistName.setText(artist.getFields().getArtistes().trim());
-            artisteMark.setRating(Float.parseFloat(artist.fields.getMark()));
+            artisteMark.setRating(0);
+            artisteMoyenne.setText(artist.fields.getMark().substring(0,4));
             artistePremiereSalle.setText(artist.getFields().getPremiere_salle().trim());
             if (artist.getFields().getSpotify()!= null && !artist.getFields().getSpotify().isEmpty()) {
                 artisteSpotify.setVisibility(View.VISIBLE);
