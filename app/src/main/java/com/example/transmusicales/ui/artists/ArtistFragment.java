@@ -276,7 +276,11 @@ public class ArtistFragment extends Fragment{
         void setArtist(Artist artist) {
             artistName.setText(artist.getFields().getArtistes().trim());
             artisteMark.setRating(0);
-            artisteMoyenne.setText(artist.fields.getMark().substring(0,4));
+            if(artist.fields.getMark().length()>=4){
+                artisteMoyenne.setText(artist.fields.getMark().substring(0,4));
+            }else{
+                artisteMoyenne.setText(artist.fields.getMark());
+            }
             artistePremiereSalle.setText(artist.getFields().getPremiere_salle().trim());
             if (artist.getFields().getSpotify()!= null && !artist.getFields().getSpotify().isEmpty()) {
                 artisteSpotify.setVisibility(View.VISIBLE);
@@ -309,6 +313,7 @@ public class ArtistFragment extends Fragment{
                         System.out.println("Artiste : "+artist.getMark());
                         mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("mark").setValue(artist.getMark());
                         mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("nbpersonne").setValue(artist.getNbPersonne());
+                        myMarkStar.setRating(Float.parseFloat(artist.getMark()));
                     }
                 }
             });
