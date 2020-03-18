@@ -87,7 +87,8 @@ public class Artist {
 
     public void setMark(float rating) {
         Fields f = this.getFields();
-        f.setMark(String.valueOf(rating));
+        float moy = (Float.parseFloat(this.getMark())*Float.parseFloat(this.getNbPersonne())+rating)/(Float.parseFloat(getNbPersonne())+1);
+        f.setMark(String.valueOf(moy));
         this.setFields(f);
     }
 

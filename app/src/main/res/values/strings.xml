@@ -14,4 +14,8 @@
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
     <string name="menu_artists">Artistes</string>
+    <string name="deezer_album">Deezer album</string>
+    <string name="spotify_album">Spotify album</string>
+    <string name="google_maps">Google Maps</string>
+    <string name="mark">Mark</string>
 </resources>
