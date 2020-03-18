@@ -1,6 +1,7 @@
 package com.example.transmusicales.ui.artists;
 
 import android.app.Dialog;
+import android.widget.SearchView;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +16,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,7 +36,6 @@ import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class ArtistFragment extends Fragment implements Filterable {
 
@@ -65,6 +64,28 @@ public class ArtistFragment extends Fragment implements Filterable {
                              ViewGroup container, Bundle savedInstanceState) {
 
         View root = inflater.inflate(R.layout.fragment_artists, container, false);
+
+        //Test recherche
+        //SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = root.findViewById(R.id.search_artists);
+        //searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // filter recycler view when query submitted
+                getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                // filter recycler view when text is changed
+                getFilter().filter(query);
+                return false;
+            }
+        });
 
         // STEP 2 : access the DB...
         mFireDataBase = FirebaseDatabase.getInstance();
@@ -289,6 +310,7 @@ public class ArtistFragment extends Fragment implements Filterable {
         };
     }
 
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout root;
         private TextView artistName;
@@ -298,6 +320,7 @@ public class ArtistFragment extends Fragment implements Filterable {
         private ImageView artisteDeezer;
         private ImageView artisteGMaps;
         private TextView artisteMoyenne;
+        private SearchView searchView;
 
         ViewHolder(View itemView) {
             super(itemView);

@@ -41,6 +41,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <SearchView
+        android:id="@+id/search_artists"
         android:layout_width="409dp"
         android:layout_height="48dp"
         android:layout_marginStart="1dp"
