@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
@@ -36,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ArtistFragment extends Fragment{
+public class ArtistFragment extends Fragment implements Filterable {
 
     // Firebase reference
     private FirebaseDatabase mFireDataBase;
@@ -44,6 +46,7 @@ public class ArtistFragment extends Fragment{
     private RecyclerView recyclerView;
     private SearchView searchView;
     List<Artist> artists;
+    List<Artist> artistsFiltred;
     //STEP 4: child event lister.
     private FirebaseRecyclerPagingAdapter<Artist, ViewHolder> mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -249,6 +252,41 @@ public class ArtistFragment extends Fragment{
             };
             mArtisteDatabaseReference.addChildEventListener(mChildEventListener);
         }
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String charString = charSequence.toString();
+                if (charString.isEmpty()) {
+                    artistsFiltred = artists;
+                } else {
+                    List<Artist> filteredList = new ArrayList<>();
+                    for (Artist row : artists) {
+
+                        // name match condition. this might differ depending on your requirement
+                        // here we are looking for name or lieu
+                        if (row.getFields().getArtistes().trim().toLowerCase().contains(charString.toLowerCase()) || row.getFields().getPremiere_salle().contains(charSequence)) {
+                            filteredList.add(row);
+                        }
+                    }
+
+                    artistsFiltred = filteredList;
+                }
+
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = artistsFiltred;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                artistsFiltred = (ArrayList<Artist>) filterResults.values;
+                mAdapter.notifyDataSetChanged();
+            }
+        };
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
