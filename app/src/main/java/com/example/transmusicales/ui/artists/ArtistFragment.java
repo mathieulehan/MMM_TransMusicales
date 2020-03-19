@@ -1,6 +1,7 @@
 package com.example.transmusicales.ui.artists;
 
 import android.app.Dialog;
+import android.util.Log;
 import android.widget.SearchView;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -258,6 +259,7 @@ public class ArtistFragment extends Fragment implements Filterable {
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                     Artist artist = dataSnapshot.getValue(Artist.class);
                     artist.setUid(dataSnapshot.getKey());
+                    updateArtist(artist);
                     mAdapter.notifyDataSetChanged();
                 }
                 @Override
@@ -273,6 +275,26 @@ public class ArtistFragment extends Fragment implements Filterable {
             };
             mArtisteDatabaseReference.addChildEventListener(mChildEventListener);
         }
+    }
+
+    public void updateArtist(Artist updatedArtist) {
+
+        Artist oldArtist = artistsFiltred.stream()
+                .filter(c -> (updatedArtist.getUid().equals(c.getUid())))
+                .findFirst()
+                .orElse(null);
+        if (oldArtist != null) {
+            artistsFiltred.set(artistsFiltred.indexOf(oldArtist), updatedArtist);
+            Log.i("TAG","updated likes from DB for "+updatedArtist.getFields().getArtistes().trim()+" = "+ updatedArtist.getMark());
+        }
+
+        oldArtist = artists.stream()
+                .filter(c -> (updatedArtist.getUid().equals(c.getUid())))
+                .findFirst()
+                .orElse(null);
+        if (oldArtist != null)
+            artists.set(artists.indexOf(oldArtist),updatedArtist);
+
     }
 
     @Override
