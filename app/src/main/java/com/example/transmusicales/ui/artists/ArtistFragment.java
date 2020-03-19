@@ -286,11 +286,14 @@ public class ArtistFragment extends Fragment implements Filterable {
                 } else {
                     List<Artist> filteredList = new ArrayList<>();
                     for (Artist row : artists) {
-
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or lieu
-                        if (row.getFields().getArtistes().trim().toLowerCase().contains(charString.toLowerCase()) || row.getFields().getPremiere_salle().contains(charSequence)) {
-                            filteredList.add(row);
+                        if(row.getFields() != null){
+                            if(row.getFields().getPremiere_salle() != null) {
+                                if (row.getFields().getArtistes().trim().toLowerCase().contains(charString.toLowerCase()) || row.getFields().getPremiere_salle().contains(charSequence)) {
+                                    filteredList.add(row);
+                                }
+                            }
                         }
                     }
 
