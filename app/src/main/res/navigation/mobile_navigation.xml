@@ -18,9 +18,9 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/nav_gallery"
+        android:id="@+id/nav_map"
         android:name="com.example.transmusicales.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
+        android:label="@string/menu_map"
         tools:layout="@layout/fragment_gallery" />
 
     <fragment
