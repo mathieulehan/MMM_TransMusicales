@@ -48,8 +48,8 @@ public class ArtistFragment extends Fragment {
     private FirebaseRecyclerPagingAdapter<Artist, ViewHolder> mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ChildEventListener mChildEventListener;
-    int pastVisiblesItems, visibleItemCount, totalItemCount;
-    boolean userScrolled = false;
+    private int pastVisiblesItems, visibleItemCount, totalItemCount;
+    private boolean userScrolled = false;
     private boolean loading = true;
 
     @Override
@@ -187,7 +187,7 @@ public class ArtistFragment extends Fragment {
                             }
                         });
 
-                        holder.onUpdateMark(artiste,mArtisteDatabaseReference, artists);
+                        holder.onUpdateMark(artiste,mArtisteDatabaseReference);
                     }
 
                     @Override
@@ -277,7 +277,16 @@ public class ArtistFragment extends Fragment {
         }
     }
 
-    public void updateArtist(Artist updatedArtist) {
+    private void updateArtist(Artist updatedArtist) {
+        if (artistsFiltred != null) {
+            Artist oldArtist = artistsFiltred.stream()
+                    .filter(c -> (updatedArtist.getUid().equals(c.getUid())))
+                    .findFirst()
+                    .orElse(null);
+            if (oldArtist != null) {
+                artistsFiltred.set(artistsFiltred.indexOf(oldArtist), updatedArtist);
+                Log.i("TAG", "updated from DB for " + updatedArtist.getFields().getArtistes().trim() + " = " + updatedArtist.getMark());
+            }
 
         Artist oldArtist = artists.stream()
                 .filter(c -> (updatedArtist.getUid().equals(c.getUid())))
@@ -287,14 +296,6 @@ public class ArtistFragment extends Fragment {
             artists.set(artists.indexOf(oldArtist), updatedArtist);
             Log.i("TAG","updated likes from DB for "+updatedArtist.getFields().getArtistes().trim()+" = "+ updatedArtist.getMark());
         }
-
-        oldArtist = artists.stream()
-                .filter(c -> (updatedArtist.getUid().equals(c.getUid())))
-                .findFirst()
-                .orElse(null);
-        if (oldArtist != null)
-            artists.set(artists.indexOf(oldArtist),updatedArtist);
-
     }
 
     public void setFilter(String searchText, View root) {
@@ -318,6 +319,7 @@ public class ArtistFragment extends Fragment {
         private ImageView artisteGMaps;
         private TextView artisteMoyenne;
         private SearchView searchView;
+        private boolean drap = true;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -333,11 +335,13 @@ public class ArtistFragment extends Fragment {
 
         void setArtist(Artist artist) {
             artistName.setText(artist.getFields().getArtistes().trim());
-            artisteMark.setRating(0);
-            if(artist.fields.getMark().length()>=4){
-                artisteMoyenne.setText(artist.fields.getMark().substring(0,4));
-            }else{
-                artisteMoyenne.setText(artist.fields.getMark());
+            if(drap){
+                if(artist.fields.getMark().length()>=4){
+                    artisteMoyenne.setText(artist.fields.getMark().substring(0,4));
+                }else{
+                    artisteMoyenne.setText(artist.fields.getMark());
+                }
+                drap = false;
             }
             artistePremiereSalle.setText(artist.getFields().getPremiere_salle().trim());
             if (artist.getFields().getSpotify()!= null && !artist.getFields().getSpotify().isEmpty()) {
@@ -359,19 +363,24 @@ public class ArtistFragment extends Fragment {
             else { artisteGMaps.setVisibility(View.GONE); }
         }
 
-        public void onUpdateMark(Artist artist, DatabaseReference mArtisteDatabaseReference, List<Artist> artists) {
+        public void onUpdateMark(Artist artist, DatabaseReference mArtisteDatabaseReference) {
             RatingBar myMarkStar = artisteMark;
             myMarkStar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
                 @Override
                 public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
 
                     if(rating != 0.0){
-                        artist.setNbPersonne(Integer.parseInt(artist.getNbPersonne())+1);
-                        artist.setMark(rating);
-                        System.out.println("Artiste : "+artist.getMark());
-                        mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("mark").setValue(artist.getMark());
-                        mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("nbpersonne").setValue(artist.getNbPersonne());
-                        myMarkStar.setRating(Float.parseFloat(artist.getMark()));
+                        artist.fields.setNbpersonne(String.valueOf(Integer.parseInt(artist.getNbPersonne())+1));
+                        Float moy = (Float.parseFloat(artist.fields.getMark())*Float.parseFloat(artist.fields.getNbpersonne())+rating)/(Float.parseFloat(artist.fields.getNbpersonne())+1);
+                        artist.fields.setMark(String.valueOf(rating));
+                        System.out.println("Artiste : "+rating);
+                        mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("mark").setValue(String.valueOf(moy));
+                        mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("nbpersonne").setValue(artist.fields.getNbpersonne());
+                        if(String.valueOf(moy).length()>=4){
+                            artisteMoyenne.setText(String.valueOf(moy).substring(0,4));
+                        }else{
+                            artisteMoyenne.setText(String.valueOf(moy));
+                        }
                     }
                 }
             });
