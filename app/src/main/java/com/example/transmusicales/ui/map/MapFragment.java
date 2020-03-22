@@ -1,6 +1,7 @@
-package com.example.transmusicales.ui.gallery;
+package com.example.transmusicales.ui.map;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +16,12 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class GalleryFragment extends Fragment {
+import static androidx.constraintlayout.widget.Constraints.TAG;
+
+public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     MapView mMapView;
     private GoogleMap googleMap;
@@ -83,4 +87,17 @@ public class GalleryFragment extends Fragment {
             super.onLowMemory();
             mMapView.onLowMemory();
         }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        // Custom map styling
+        boolean success = googleMap.setMapStyle(new MapStyleOptions(getResources()
+                .getString(R.string.style_json)));
+
+        if (!success) {
+            Log.e(TAG, "Style parsing failed.");
+        }
+        // Position the map's camera near Rennes, France.
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(48, -1.68)));
     }
+}
