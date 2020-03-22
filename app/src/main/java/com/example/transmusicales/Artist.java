@@ -98,17 +98,21 @@ public class Artist {
 
     @NonNull
     public String toString() {
-        return "Nom : " + this.fields.getArtistes() +
-                "\nNombre de personnes : " + this.getNbPersonne() +
-                "\nNote moyenne : " + this.getMark() +
-                "\nSpotify : " + this.fields.getSpotify() +
-                "\nDeezer : " + this.fields.getDeezer() +
-                "\nAnnée : " + this.fields.getAnnee() +
-                "\nLangue : " + this.fields.getCou_official_lang_code() +
-                "\nOrigine (pays) : " + this.fields.getOrigine_pays1() +
-                "\nOrigine (ville) : " + this.fields.getOrigine_ville1() +
-                "\nPremière date : " + this.fields.getPremiere_date() +
-                "\nUId : " + this.getUid() +
-                "\nNom du spectacle / de la soirée : " + this.fields.getNom_spectacle_ou_soiree();
+        if (this.fields != null) {
+            return "Nom : " + this.fields.getName() +
+                    "\nNombre de personnes : " + this.getNbPersonne() +
+                    "\nNote moyenne : " + this.getMark() +
+                    "\nSpotify : " + this.fields.getSpotify() +
+                    "\nDeezer : " + this.fields.getDeezer() +
+                    "\nAnnée : " + this.fields.getAnnee() +
+                    "\nLangue : " + this.fields.getCou_official_lang_code() +
+                    "\nOrigine (pays) : " + this.fields.getOrigine_pays1() +
+                    "\nOrigine (ville) : " + this.fields.getOrigine_ville1() +
+                    "\nPremière date : " + this.fields.getPremiere_date() +
+                    "\nUId : " + this.getUid() +
+                    "\nNom du spectacle / de la soirée : " + this.fields.getNom_spectacle_ou_soiree();
+        } else {
+            return "Erreur lors de l'affichage des informations concernant l'artiste";
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.example.transmusicales.ui.artists;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,11 +10,11 @@ import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -35,8 +36,7 @@ import com.google.firebase.database.Query;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class ArtistFragment extends Fragment{
+public class ArtistFragment extends Fragment {
 
     // Firebase reference
     private FirebaseDatabase mFireDataBase;
@@ -48,8 +48,8 @@ public class ArtistFragment extends Fragment{
     private FirebaseRecyclerPagingAdapter<Artist, ViewHolder> mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ChildEventListener mChildEventListener;
-    int pastVisiblesItems, visibleItemCount, totalItemCount;
-    boolean userScrolled = false;
+    private int pastVisiblesItems, visibleItemCount, totalItemCount;
+    private boolean userScrolled = false;
     private boolean loading = true;
 
     @Override
@@ -63,6 +63,28 @@ public class ArtistFragment extends Fragment{
 
         View root = inflater.inflate(R.layout.fragment_artists, container, false);
 
+        //Test recherche
+        //SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = root.findViewById(R.id.search_artists);
+        //searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // filter recycler view when query submitted
+                setFilter(query, root);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                // filter recycler view when text is changed
+                setFilter(query, root);
+                return false;
+            }
+        });
+
         // STEP 2 : access the DB...
         mFireDataBase = FirebaseDatabase.getInstance();
 
@@ -71,98 +93,13 @@ public class ArtistFragment extends Fragment{
 
         mArtisteDatabaseReference = mFireDataBase.getReference().child("artistes");
 
-        // This configuration comes from the Paging Support Library
-        // https://developer.android.com/reference/android/arch/paging/PagedList.Config.html
-        PagedList.Config config = new PagedList.Config.Builder()
-                .setEnablePlaceholders(false)
-                .setPrefetchDistance(10)
-                .setPageSize(20)
-                .build();
-
-        // The options for the adapter combine the paging configuration with query information
-        // and application-specific options for lifecycle, etc.
-        DatabasePagingOptions<Artist> options = new DatabasePagingOptions.Builder<Artist>()
-                .setLifecycleOwner(this)
-                .setQuery(baseQuery, config, Artist.class)
-                .build();
-
         // STEP 2.2: get the recycler view
         recyclerView = root.findViewById(R.id.list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(recyclerView.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
         mSwipeRefreshLayout = root.findViewById(R.id.swipe_refresh_layout);
 
-        mAdapter =
-                new FirebaseRecyclerPagingAdapter<Artist, ViewHolder>(options) {
-                    @NonNull
-                    @Override
-                    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.artist_item, parent, false));
-                    }
-
-                    @Override
-                    protected void onBindViewHolder(@NonNull ViewHolder holder,
-                                                    int position,
-                                                    @NonNull Artist artiste) {
-                        for (Artist a: artists) {
-                            if(artiste.getRecordid() == a.getRecordid()){
-                                artiste.setUid(a.getUid());
-                            }
-                        }
-
-                        holder.setArtist(artiste);
-                        holder.itemView.setOnClickListener(new View.OnClickListener() {
-                             @Override
-                             public void onClick(View v) {
-                                 Dialog d = new Dialog(root.getContext());
-                                 d.setContentView(R.layout.selected_artist_info);
-                                 TextView artistInfos = d.findViewById(R.id.infos);
-                                 artistInfos.setText(artiste.toString());
-                                 d.show();
-                             }
-                         });
-
-                        holder.onUpdateMark(artiste,mArtisteDatabaseReference, artists);
-                    }
-
-                    @Override
-                    protected void onError(@NonNull DatabaseError databaseError) {
-                        mSwipeRefreshLayout.setRefreshing(false);
-                        databaseError.toException().printStackTrace();
-                        // Handle Error
-
-                    }
-
-                    /**
-                     * Called whenever the loading state of the adapter changes.
-                     * <p>
-                     * When the state is {@link LoadingState#ERROR} the adapter will stop loading any data
-                     *
-                     * @param state
-                     */
-                    @Override
-                    protected void onLoadingStateChanged(@NonNull LoadingState state) {
-                        mSwipeRefreshLayout = root.findViewById(R.id.swipe_refresh_layout);
-                        switch (state) {
-                            case LOADING_INITIAL:
-                            case LOADING_MORE:
-                                // Do your loading animation
-                                mSwipeRefreshLayout.setRefreshing(true);
-                                break;
-
-                            case LOADED:
-                            case FINISHED:
-                                //Reached end of Data set
-                                // Stop Animation
-                                mSwipeRefreshLayout.setRefreshing(false);
-                                break;
-
-                            case ERROR:
-                                retry();
-                                break;
-                        }
-                    }
-                };
+        mAdapter = createFirebaseAdapter(baseQuery, root);
 
         // STEP 2.3: create and set the adapter
         recyclerView.setAdapter(mAdapter);
@@ -206,6 +143,94 @@ public class ArtistFragment extends Fragment{
         return root;
     }
 
+    private FirebaseRecyclerPagingAdapter<Artist, ViewHolder> createFirebaseAdapter(Query baseQuery, View root) {
+        // This configuration comes from the Paging Support Library
+        // https://developer.android.com/reference/android/arch/paging/PagedList.Config.html
+        PagedList.Config config = new PagedList.Config.Builder()
+                .setEnablePlaceholders(false)
+                .setPrefetchDistance(10)
+                .setPageSize(20)
+                .build();
+        // The options for the adapter combine the paging configuration with query information
+        // and application-specific options for lifecycle, etc.
+        DatabasePagingOptions<Artist> options = new DatabasePagingOptions.Builder<Artist>()
+                .setLifecycleOwner(this)
+                .setQuery(baseQuery, config, Artist.class)
+                .build();
+        mAdapter =
+                new FirebaseRecyclerPagingAdapter<Artist, ViewHolder>(options) {
+                    @NonNull
+                    @Override
+                    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.artist_item, parent, false));
+                    }
+
+                    @Override
+                    protected void onBindViewHolder(@NonNull ViewHolder holder,
+                                                    int position,
+                                                    @NonNull Artist artiste) {
+                        for (Artist a: artists) {
+                            if(artiste.getRecordid() != null && artiste.getRecordid().equals(a.getRecordid())){
+                                artiste.setUid(a.getUid());
+                            }
+                        }
+
+                        if(artiste.getFields() != null && artiste.getGeometry() != null) holder.setArtist(artiste);
+                        holder.itemView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Dialog d = new Dialog(root.getContext());
+                                d.setContentView(R.layout.selected_artist_info);
+                                TextView artistInfos = d.findViewById(R.id.infos);
+                                artistInfos.setText(artiste.toString());
+                                d.show();
+                            }
+                        });
+
+                        holder.onUpdateMark(artiste,mArtisteDatabaseReference);
+                    }
+
+                    @Override
+                    protected void onError(@NonNull DatabaseError databaseError) {
+                        mSwipeRefreshLayout.setRefreshing(false);
+                        databaseError.toException().printStackTrace();
+                        // Handle Error
+
+                    }
+
+                    /**
+                     * Called whenever the loading state of the adapter changes.
+                     * <p>
+                     * When the state is {@link LoadingState#ERROR} the adapter will stop loading any data
+                     *
+                     * @param state
+                     */
+                    @Override
+                    protected void onLoadingStateChanged(@NonNull LoadingState state) {
+                        mSwipeRefreshLayout = root.findViewById(R.id.swipe_refresh_layout);
+                        switch (state) {
+                            case LOADING_INITIAL:
+                            case LOADING_MORE:
+                                // Do your loading animation
+                                mSwipeRefreshLayout.setRefreshing(true);
+                                break;
+
+                            case LOADED:
+                            case FINISHED:
+                                //Reached end of Data set
+                                // Stop Animation
+                                mSwipeRefreshLayout.setRefreshing(false);
+                                break;
+
+                            case ERROR:
+                                retry();
+                                break;
+                        }
+                    }
+                };
+        return mAdapter;
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -234,6 +259,7 @@ public class ArtistFragment extends Fragment{
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                     Artist artist = dataSnapshot.getValue(Artist.class);
                     artist.setUid(dataSnapshot.getKey());
+                    updateArtist(artist);
                     mAdapter.notifyDataSetChanged();
                 }
                 @Override
@@ -251,6 +277,40 @@ public class ArtistFragment extends Fragment{
         }
     }
 
+    private void updateArtist(Artist updatedArtist) {
+        if (artists != null) {
+            Artist oldArtist = artists.stream()
+                    .filter(c -> (updatedArtist.getUid().equals(c.getUid())))
+                    .findFirst()
+                    .orElse(null);
+            if (oldArtist != null) {
+                artists.set(artists.indexOf(oldArtist), updatedArtist);
+                Log.i("TAG", "updated from DB for " + updatedArtist.getFields().getName().trim() + " = " + updatedArtist.getMark());
+            }
+
+            oldArtist = artists.stream()
+                    .filter(c -> (updatedArtist.getUid().equals(c.getUid())))
+                    .findFirst()
+                    .orElse(null);
+            if (oldArtist != null) {
+                artists.set(artists.indexOf(oldArtist), updatedArtist);
+                Log.i("TAG", "updated likes from DB for " + updatedArtist.getFields().getName().trim() + " = " + updatedArtist.getMark());
+            }
+        }
+    }
+
+    public void setFilter (String searchText, View root){
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("artistes");
+        Query baseQuery = ref.orderByChild("fields/name").startAt(searchText);
+
+        mAdapter = createFirebaseAdapter(baseQuery, root);
+
+        mAdapter.startListening();
+        mAdapter.notifyDataSetChanged();
+        recyclerView.setAdapter(mAdapter);
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout root;
         private TextView artistName;
@@ -260,6 +320,8 @@ public class ArtistFragment extends Fragment{
         private ImageView artisteDeezer;
         private ImageView artisteGMaps;
         private TextView artisteMoyenne;
+        private SearchView searchView;
+        private boolean drap = true;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -274,12 +336,14 @@ public class ArtistFragment extends Fragment{
         }
 
         void setArtist(Artist artist) {
-            artistName.setText(artist.getFields().getArtistes().trim());
-            artisteMark.setRating(0);
-            if(artist.fields.getMark().length()>=4){
-                artisteMoyenne.setText(artist.fields.getMark().substring(0,4));
-            }else{
-                artisteMoyenne.setText(artist.fields.getMark());
+            artistName.setText(artist.getFields().getName().trim());
+            if(drap){
+                if(artist.fields.getMark().length()>=4){
+                    artisteMoyenne.setText(artist.fields.getMark().substring(0,4));
+                }else{
+                    artisteMoyenne.setText(artist.fields.getMark());
+                }
+                drap = false;
             }
             artistePremiereSalle.setText(artist.getFields().getPremiere_salle().trim());
             if (artist.getFields().getSpotify()!= null && !artist.getFields().getSpotify().isEmpty()) {
@@ -301,19 +365,24 @@ public class ArtistFragment extends Fragment{
             else { artisteGMaps.setVisibility(View.GONE); }
         }
 
-        public void onUpdateMark(Artist artist, DatabaseReference mArtisteDatabaseReference, List<Artist> artists) {
+        public void onUpdateMark(Artist artist, DatabaseReference mArtisteDatabaseReference) {
             RatingBar myMarkStar = artisteMark;
             myMarkStar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
                 @Override
                 public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
 
                     if(rating != 0.0){
-                        artist.setNbPersonne(Integer.parseInt(artist.getNbPersonne())+1);
-                        artist.setMark(rating);
-                        System.out.println("Artiste : "+artist.getMark());
-                        mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("mark").setValue(artist.getMark());
-                        mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("nbpersonne").setValue(artist.getNbPersonne());
-                        myMarkStar.setRating(Float.parseFloat(artist.getMark()));
+                        artist.fields.setNbpersonne(String.valueOf(Integer.parseInt(artist.getNbPersonne())+1));
+                        Float moy = (Float.parseFloat(artist.fields.getMark())*Float.parseFloat(artist.fields.getNbpersonne())+rating)/(Float.parseFloat(artist.fields.getNbpersonne())+1);
+                        artist.fields.setMark(String.valueOf(rating));
+                        System.out.println("Artiste : "+rating);
+                        mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("mark").setValue(String.valueOf(moy));
+                        mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("nbpersonne").setValue(artist.fields.getNbpersonne());
+                        if(String.valueOf(moy).length()>=4){
+                            artisteMoyenne.setText(String.valueOf(moy).substring(0,4));
+                        }else{
+                            artisteMoyenne.setText(String.valueOf(moy));
+                        }
                     }
                 }
             });
