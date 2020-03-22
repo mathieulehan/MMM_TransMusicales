@@ -170,12 +170,12 @@ public class ArtistFragment extends Fragment {
                                                     int position,
                                                     @NonNull Artist artiste) {
                         for (Artist a: artists) {
-                            if(artiste.getRecordid().equals(a.getRecordid())){
+                            if(artiste.getRecordid() != null && artiste.getRecordid().equals(a.getRecordid())){
                                 artiste.setUid(a.getUid());
                             }
                         }
 
-                        holder.setArtist(artiste);
+                        if(artiste.getFields() != null && artiste.getGeometry() != null) holder.setArtist(artiste);
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -285,7 +285,7 @@ public class ArtistFragment extends Fragment {
                     .orElse(null);
             if (oldArtist != null) {
                 artists.set(artists.indexOf(oldArtist), updatedArtist);
-                Log.i("TAG", "updated from DB for " + updatedArtist.getFields().getArtistes().trim() + " = " + updatedArtist.getMark());
+                Log.i("TAG", "updated from DB for " + updatedArtist.getFields().getName().trim() + " = " + updatedArtist.getMark());
             }
 
             oldArtist = artists.stream()
@@ -294,7 +294,7 @@ public class ArtistFragment extends Fragment {
                     .orElse(null);
             if (oldArtist != null) {
                 artists.set(artists.indexOf(oldArtist), updatedArtist);
-                Log.i("TAG", "updated likes from DB for " + updatedArtist.getFields().getArtistes().trim() + " = " + updatedArtist.getMark());
+                Log.i("TAG", "updated likes from DB for " + updatedArtist.getFields().getName().trim() + " = " + updatedArtist.getMark());
             }
         }
     }
@@ -302,7 +302,7 @@ public class ArtistFragment extends Fragment {
     public void setFilter (String searchText, View root){
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-        Query baseQuery = ref.child("artistes");
+        Query baseQuery = ref.child("artistes").orderByChild("recordid");
 
         mAdapter = createFirebaseAdapter(baseQuery, root);
 
@@ -336,7 +336,7 @@ public class ArtistFragment extends Fragment {
         }
 
         void setArtist(Artist artist) {
-            artistName.setText(artist.getFields().getArtistes().trim());
+            artistName.setText(artist.getFields().getName().trim());
             if(drap){
                 if(artist.fields.getMark().length()>=4){
                     artisteMoyenne.setText(artist.fields.getMark().substring(0,4));

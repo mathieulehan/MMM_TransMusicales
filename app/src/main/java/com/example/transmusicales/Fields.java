@@ -6,7 +6,7 @@ public class Fields {
     private String spotify;
     private String cou_official_lang_code;
     private String cou_onu_code;
-    private String artistes;
+    private String name;
     private String mark;
     private String nbpersonne;
     private String cou_iso2_code;
@@ -65,11 +65,11 @@ public class Fields {
 
     }
 
-    public Fields(String spotify, String cou_official_lang_code, String cou_onu_code, String artistes, String mark, String nbpersonne, String cou_iso2_code, ArrayList<Long> geo_point_2d, String cou_iso3_code, String cou_is_receiving_quest, String edition, String cou_text_sp, String cou_is_ilomember, String annee, String deezer, String cou_text_en, String origine_pays1, Long premiere_date_timestamp, String origine_ville1, String premiere_salle, String premiere_date, String deuxieme_salle, Long deuxieme_date_timestamp, String deuxieme_date, String troisieme_date, Long troisieme_date_timestamp, String troisieme_salle, String sixieme_date, String cinquieme_projet, String column_47, String column_45, String column_46, String column_48, String cinquieme_date, String quatrieme_date, String quatrieme_projet, String quatrieme_salle, Long quatrieme_date_timestamp, Long cinquieme_date_timestamp, String sixieme_salle, String troisieme_projet, String cinquieme_salle, Long sixieme_date_timestamp, String sixieme_projet, String origine_pays2, String origine_ville2, String deuxieme_projet, String premier_projet_atm, String nom_spectacle_ou_soiree, String origine_pays3, String origine_pays4, String quatrieme_ville, String origine_ville4, String premiere_ville, String deuxieme_ville, String troisieme_ville, String origine_ville3) {
+    public Fields(String spotify, String cou_official_lang_code, String cou_onu_code, String name, String mark, String nbpersonne, String cou_iso2_code, ArrayList<Long> geo_point_2d, String cou_iso3_code, String cou_is_receiving_quest, String edition, String cou_text_sp, String cou_is_ilomember, String annee, String deezer, String cou_text_en, String origine_pays1, Long premiere_date_timestamp, String origine_ville1, String premiere_salle, String premiere_date, String deuxieme_salle, Long deuxieme_date_timestamp, String deuxieme_date, String troisieme_date, Long troisieme_date_timestamp, String troisieme_salle, String sixieme_date, String cinquieme_projet, String column_47, String column_45, String column_46, String column_48, String cinquieme_date, String quatrieme_date, String quatrieme_projet, String quatrieme_salle, Long quatrieme_date_timestamp, Long cinquieme_date_timestamp, String sixieme_salle, String troisieme_projet, String cinquieme_salle, Long sixieme_date_timestamp, String sixieme_projet, String origine_pays2, String origine_ville2, String deuxieme_projet, String premier_projet_atm, String nom_spectacle_ou_soiree, String origine_pays3, String origine_pays4, String quatrieme_ville, String origine_ville4, String premiere_ville, String deuxieme_ville, String troisieme_ville, String origine_ville3) {
         this.spotify = spotify;
         this.cou_official_lang_code = cou_official_lang_code;
         this.cou_onu_code = cou_onu_code;
-        this.artistes = artistes;
+        this.name = name;
         this.mark = mark;
         this.nbpersonne = nbpersonne;
         this.cou_iso2_code = cou_iso2_code;
@@ -149,12 +149,12 @@ public class Fields {
         this.cou_onu_code = cou_onu_code;
     }
 
-    public String getArtistes() {
-        return artistes;
+    public String getName() {
+        return name;
     }
 
-    public void setArtistes(String artistes) {
-        this.artistes = artistes;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getMark() {
