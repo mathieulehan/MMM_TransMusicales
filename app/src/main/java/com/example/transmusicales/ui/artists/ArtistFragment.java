@@ -1,18 +1,16 @@
 package com.example.transmusicales.ui.artists;
 
 import android.app.Dialog;
-import android.util.Log;
-import android.widget.SearchView;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -38,7 +36,7 @@ import com.google.firebase.database.Query;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArtistFragment extends Fragment implements Filterable {
+public class ArtistFragment extends Fragment {
 
     // Firebase reference
     private FirebaseDatabase mFireDataBase;
@@ -46,7 +44,6 @@ public class ArtistFragment extends Fragment implements Filterable {
     private RecyclerView recyclerView;
     private SearchView searchView;
     List<Artist> artists;
-    List<Artist> artistsFiltred;
     //STEP 4: child event lister.
     private FirebaseRecyclerPagingAdapter<Artist, ViewHolder> mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -76,14 +73,14 @@ public class ArtistFragment extends Fragment implements Filterable {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // filter recycler view when query submitted
-                getFilter().filter(query);
+                setFilter(query, root);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String query) {
                 // filter recycler view when text is changed
-                getFilter().filter(query);
+                setFilter(query, root);
                 return false;
             }
         });
@@ -96,6 +93,57 @@ public class ArtistFragment extends Fragment implements Filterable {
 
         mArtisteDatabaseReference = mFireDataBase.getReference().child("artistes");
 
+        // STEP 2.2: get the recycler view
+        recyclerView = root.findViewById(R.id.list);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(recyclerView.getContext());
+        recyclerView.setLayoutManager(linearLayoutManager);
+        mSwipeRefreshLayout = root.findViewById(R.id.swipe_refresh_layout);
+
+        mAdapter = createFirebaseAdapter(baseQuery, root);
+
+        // STEP 2.3: create and set the adapter
+        recyclerView.setAdapter(mAdapter);
+        recyclerView.setHasFixedSize(true);
+        mAdapter.startListening();
+        // STEP 4: listen to any change on the DB
+        enableUpdatesFromDB();
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                // Here get the child count, item count and visibleitems
+                // from layout manager
+
+                visibleItemCount = linearLayoutManager.getChildCount();
+                totalItemCount = linearLayoutManager.getItemCount();
+                pastVisiblesItems = linearLayoutManager
+                        .findFirstVisibleItemPosition();
+
+                // Now check if userScrolled is true and also check if
+                // the item is end then update recycler view and set
+                // userScrolled to false
+                if (userScrolled && (visibleItemCount + pastVisiblesItems) == totalItemCount) {
+                    userScrolled = false;
+                }
+            }
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+
+                super.onScrollStateChanged(recyclerView, newState);
+
+                // If scroll state is touch scroll then set userScrolled
+                // true
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    userScrolled = true;
+                }
+            }
+        });
+
+        return root;
+    }
+
+    private FirebaseRecyclerPagingAdapter<Artist, ViewHolder> createFirebaseAdapter(Query baseQuery, View root) {
         // This configuration comes from the Paging Support Library
         // https://developer.android.com/reference/android/arch/paging/PagedList.Config.html
         PagedList.Config config = new PagedList.Config.Builder()
@@ -103,20 +151,12 @@ public class ArtistFragment extends Fragment implements Filterable {
                 .setPrefetchDistance(10)
                 .setPageSize(20)
                 .build();
-
         // The options for the adapter combine the paging configuration with query information
         // and application-specific options for lifecycle, etc.
         DatabasePagingOptions<Artist> options = new DatabasePagingOptions.Builder<Artist>()
                 .setLifecycleOwner(this)
                 .setQuery(baseQuery, config, Artist.class)
                 .build();
-
-        // STEP 2.2: get the recycler view
-        recyclerView = root.findViewById(R.id.list);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(recyclerView.getContext());
-        recyclerView.setLayoutManager(linearLayoutManager);
-        mSwipeRefreshLayout = root.findViewById(R.id.swipe_refresh_layout);
-
         mAdapter =
                 new FirebaseRecyclerPagingAdapter<Artist, ViewHolder>(options) {
                     @NonNull
@@ -130,22 +170,22 @@ public class ArtistFragment extends Fragment implements Filterable {
                                                     int position,
                                                     @NonNull Artist artiste) {
                         for (Artist a: artists) {
-                            if(artiste.getRecordid() == a.getRecordid()){
+                            if(artiste.getRecordid().equals(a.getRecordid())){
                                 artiste.setUid(a.getUid());
                             }
                         }
 
                         holder.setArtist(artiste);
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
-                             @Override
-                             public void onClick(View v) {
-                                 Dialog d = new Dialog(root.getContext());
-                                 d.setContentView(R.layout.selected_artist_info);
-                                 TextView artistInfos = d.findViewById(R.id.infos);
-                                 artistInfos.setText(artiste.toString());
-                                 d.show();
-                             }
-                         });
+                            @Override
+                            public void onClick(View v) {
+                                Dialog d = new Dialog(root.getContext());
+                                d.setContentView(R.layout.selected_artist_info);
+                                TextView artistInfos = d.findViewById(R.id.infos);
+                                artistInfos.setText(artiste.toString());
+                                d.show();
+                            }
+                        });
 
                         holder.onUpdateMark(artiste,mArtisteDatabaseReference, artists);
                     }
@@ -188,47 +228,7 @@ public class ArtistFragment extends Fragment implements Filterable {
                         }
                     }
                 };
-
-        // STEP 2.3: create and set the adapter
-        recyclerView.setAdapter(mAdapter);
-        recyclerView.setHasFixedSize(true);
-        mAdapter.startListening();
-        // STEP 4: listen to any change on the DB
-        enableUpdatesFromDB();
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                // Here get the child count, item count and visibleitems
-                // from layout manager
-
-                visibleItemCount = linearLayoutManager.getChildCount();
-                totalItemCount = linearLayoutManager.getItemCount();
-                pastVisiblesItems = linearLayoutManager
-                        .findFirstVisibleItemPosition();
-
-                // Now check if userScrolled is true and also check if
-                // the item is end then update recycler view and set
-                // userScrolled to false
-                if (userScrolled && (visibleItemCount + pastVisiblesItems) == totalItemCount) {
-                    userScrolled = false;
-                }
-            }
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-
-                super.onScrollStateChanged(recyclerView, newState);
-
-                // If scroll state is touch scroll then set userScrolled
-                // true
-                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                    userScrolled = true;
-                }
-            }
-        });
-
-        return root;
+        return mAdapter;
     }
 
     @Override
@@ -279,12 +279,12 @@ public class ArtistFragment extends Fragment implements Filterable {
 
     public void updateArtist(Artist updatedArtist) {
 
-        Artist oldArtist = artistsFiltred.stream()
+        Artist oldArtist = artists.stream()
                 .filter(c -> (updatedArtist.getUid().equals(c.getUid())))
                 .findFirst()
                 .orElse(null);
         if (oldArtist != null) {
-            artistsFiltred.set(artistsFiltred.indexOf(oldArtist), updatedArtist);
+            artists.set(artists.indexOf(oldArtist), updatedArtist);
             Log.i("TAG","updated likes from DB for "+updatedArtist.getFields().getArtistes().trim()+" = "+ updatedArtist.getMark());
         }
 
@@ -297,44 +297,16 @@ public class ArtistFragment extends Fragment implements Filterable {
 
     }
 
-    @Override
-    public Filter getFilter() {
-        return new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence charSequence) {
-                String charString = charSequence.toString();
-                if (charString.isEmpty()) {
-                    artistsFiltred = artists;
-                } else {
-                    List<Artist> filteredList = new ArrayList<>();
-                    for (Artist row : artists) {
-                        // name match condition. this might differ depending on your requirement
-                        // here we are looking for name or lieu
-                        if(row.getFields() != null){
-                            if(row.getFields().getPremiere_salle() != null) {
-                                if (row.getFields().getArtistes().trim().toLowerCase().contains(charString.toLowerCase()) || row.getFields().getPremiere_salle().contains(charSequence)) {
-                                    filteredList.add(row);
-                                }
-                            }
-                        }
-                    }
+    public void setFilter(String searchText, View root) {
 
-                    artistsFiltred = filteredList;
-                }
+        Query baseQuery = mFireDataBase.getReference("fields").child("artistes").startAt(searchText).endAt(searchText+"\uf8ff");
 
-                FilterResults filterResults = new FilterResults();
-                filterResults.values = artistsFiltred;
-                return filterResults;
-            }
+        mAdapter = createFirebaseAdapter(baseQuery, root);
 
-            @Override
-            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                artistsFiltred = (ArrayList<Artist>) filterResults.values;
-                mAdapter.notifyDataSetChanged();
-            }
-        };
+        mAdapter.startListening();
+        mAdapter.notifyDataSetChanged();
+        recyclerView.setAdapter(mAdapter);
     }
-
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout root;
