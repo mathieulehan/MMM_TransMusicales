@@ -301,8 +301,8 @@ public class ArtistFragment extends Fragment {
 
     public void setFilter (String searchText, View root){
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-        Query baseQuery = ref.child("artistes").orderByChild("recordid");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("artistes");
+        Query baseQuery = ref.orderByChild("fields/name").startAt(searchText);
 
         mAdapter = createFirebaseAdapter(baseQuery, root);
 
