@@ -299,7 +299,8 @@ public class ArtistFragment extends Fragment {
 
     public void setFilter(String searchText, View root) {
 
-        Query baseQuery = mFireDataBase.getReference("fields").child("artistes").startAt(searchText).endAt(searchText+"\uf8ff");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        Query baseQuery = ref.child("artistes");
 
         mAdapter = createFirebaseAdapter(baseQuery, root);
 
