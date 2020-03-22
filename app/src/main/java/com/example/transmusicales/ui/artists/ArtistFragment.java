@@ -278,29 +278,30 @@ public class ArtistFragment extends Fragment {
     }
 
     private void updateArtist(Artist updatedArtist) {
-        if (artistsFiltred != null) {
-            Artist oldArtist = artistsFiltred.stream()
+        if (artists != null) {
+            Artist oldArtist = artists.stream()
                     .filter(c -> (updatedArtist.getUid().equals(c.getUid())))
                     .findFirst()
                     .orElse(null);
             if (oldArtist != null) {
-                artistsFiltred.set(artistsFiltred.indexOf(oldArtist), updatedArtist);
+                artists.set(artists.indexOf(oldArtist), updatedArtist);
                 Log.i("TAG", "updated from DB for " + updatedArtist.getFields().getArtistes().trim() + " = " + updatedArtist.getMark());
             }
 
-        Artist oldArtist = artists.stream()
-                .filter(c -> (updatedArtist.getUid().equals(c.getUid())))
-                .findFirst()
-                .orElse(null);
-        if (oldArtist != null) {
-            artists.set(artists.indexOf(oldArtist), updatedArtist);
-            Log.i("TAG","updated likes from DB for "+updatedArtist.getFields().getArtistes().trim()+" = "+ updatedArtist.getMark());
+            oldArtist = artists.stream()
+                    .filter(c -> (updatedArtist.getUid().equals(c.getUid())))
+                    .findFirst()
+                    .orElse(null);
+            if (oldArtist != null) {
+                artists.set(artists.indexOf(oldArtist), updatedArtist);
+                Log.i("TAG", "updated likes from DB for " + updatedArtist.getFields().getArtistes().trim() + " = " + updatedArtist.getMark());
+            }
         }
     }
 
-    public void setFilter(String searchText, View root) {
+    public void setFilter (String searchText, View root){
 
-        Query baseQuery = mFireDataBase.getReference("fields").child("artistes").startAt(searchText).endAt(searchText+"\uf8ff");
+        Query baseQuery = mFireDataBase.getReference("fields").child("artistes").startAt(searchText).endAt(searchText + "\uf8ff");
 
         mAdapter = createFirebaseAdapter(baseQuery, root);
 
