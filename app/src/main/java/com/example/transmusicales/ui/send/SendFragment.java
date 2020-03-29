@@ -33,7 +33,7 @@ public class SendFragment extends Fragment {
     // Firebase reference
     private FirebaseDatabase mFireDataBase;
     private DatabaseReference mArtisteDatabaseReference;
-    private FirebaseRecyclerAdapter<Artist, SendFragment.ViewHolder> mAdapter;
+    private FirebaseRecyclerAdapter<String, SendFragment.ViewHolder> mAdapter;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ChildEventListener mChildEventListener;
@@ -85,13 +85,7 @@ public class SendFragment extends Fragment {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {}
                 @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                    Artist updatedArtist = dataSnapshot.getValue(Artist.class);
-                    if (updatedArtist.getUid().equals(artist.getUid())) {
-                        updateArtist(updatedArtist);
-                        mAdapter.notifyDataSetChanged();
-                    }
-                }
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {}
@@ -135,13 +129,13 @@ public class SendFragment extends Fragment {
         }
     }
 
-    private FirebaseRecyclerAdapter<Artist, SendFragment.ViewHolder> createFirebaseAdapter(Query baseQuery, View root) {
-        FirebaseRecyclerOptions<Artist> options =
-                new FirebaseRecyclerOptions.Builder<Artist>()
-                        .setQuery(baseQuery, Artist.class)
+    private FirebaseRecyclerAdapter<String, SendFragment.ViewHolder> createFirebaseAdapter(Query baseQuery, View root) {
+        FirebaseRecyclerOptions<String> options =
+                new FirebaseRecyclerOptions.Builder<String>()
+                        .setQuery(baseQuery, String.class)
                         .build();
         mAdapter =
-                new FirebaseRecyclerAdapter<Artist, SendFragment.ViewHolder>(options) {
+                new FirebaseRecyclerAdapter<String, SendFragment.ViewHolder>(options) {
                     @NonNull
                     @Override
                     public SendFragment.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -159,14 +153,10 @@ public class SendFragment extends Fragment {
                     /**
                      * @param holder
                      * @param position
-                     * @param model    the model object containing the data that should be used to populate the view.
                      */
                     @Override
-                    protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull Artist model) {
-                        for (String comment : artist.getComments()) {
-                            // TODO
+                    protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull String comment) {
                             holder.setComment(comment);
-                        }
                     }
                 };
         return mAdapter;
