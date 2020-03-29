@@ -10,7 +10,10 @@ public class HomeViewModel extends ViewModel {
 
     public HomeViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is home fragment");
+        mText.setValue("\nLe Festival Transmusicales 2020 se déroulera en décembre prochain (dates encore non confirmées) à Rennes.\n\n" +
+                "Salles concernées : La Cité - L'aire Libre - Le Triangle - L'opéra - Le Parc Expo.\n\n" +
+                "Au programme du Festival Transmusicales 2020, découvrez de nombreux artistes et groupes de musique en concert à Rennes.\n\n" +
+                "Cette application vous permet de vous renseigner davantage sur les artistes qui y seront présents.");
     }
 
     public LiveData<String> getText() {
