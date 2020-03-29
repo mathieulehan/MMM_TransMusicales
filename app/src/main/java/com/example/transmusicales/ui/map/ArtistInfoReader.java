@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -21,20 +22,27 @@ public class ArtistInfoReader {
     public List<ArtistGeoInfo> read(InputStream inputStream) throws JSONException {
         List<ArtistGeoInfo> items = new ArrayList<>();
         String json = new Scanner(inputStream).useDelimiter(REGEX_INPUT_BOUNDARY_BEGINNING).next();
-        JSONArray array = new JSONArray(json);
-        for (int i = 0; i < array.length(); i++) {
+        JSONObject jsonObject = new JSONObject(json);
+        JSONObject artistes = jsonObject.getJSONObject("artistes");
+        for (Iterator<String> it = artistes.keys(); it.hasNext(); ) {
+            String key = it.next();
             String title = null;
-            String premiereSalle = null;
-            JSONObject object = array.getJSONObject(i);
-            double lat = object.getDouble("lat");
-            double lng = object.getDouble("lng");
-            if (!object.isNull("name")) {
-                title = object.getString("name");
+            try {
+                JSONObject artiste = artistes.getJSONObject(key);
+                JSONObject fields = artiste.getJSONObject("fields");
+                JSONObject geometry = artiste.getJSONObject("geometry");
+                JSONArray coordinates = geometry.getJSONArray("coordinates");
+
+                double lng = coordinates.getDouble(0);
+                double lat = coordinates.getDouble(1);
+                if (!fields.isNull("name")) {
+                    title = fields.getString("name");
+                }
+                items.add(new ArtistGeoInfo(lat, lng, title));
             }
-            if (!object.isNull("premiere_salle")) {
-                premiereSalle = object.getString("premiere_salle");
+            catch (JSONException e) {
+                System.out.println("Error while reading artiste " + key);
             }
-            items.add(new ArtistGeoInfo(lat, lng, title, premiereSalle));
         }
         return items;
     }

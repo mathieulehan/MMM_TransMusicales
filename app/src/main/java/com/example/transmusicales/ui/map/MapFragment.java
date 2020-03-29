@@ -132,15 +132,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void readMarkers() throws JSONException {
         InputStream inputStream = getResources().openRawResource(R.raw.transmusicales);
         List<ArtistGeoInfo> items = new ArtistInfoReader().read(inputStream);
-        for (int i = 0; i < 10; i++) {
-            double offset = i / 60d;
-            for (ArtistGeoInfo item : items) {
-                LatLng position = item.getPosition();
-                double lat = position.latitude + offset;
-                double lng = position.longitude + offset;
-                ArtistGeoInfo offsetItem = new ArtistGeoInfo(lat, lng);
-                mClusterManager.addItem(offsetItem);
-            }
+        for (ArtistGeoInfo item : items) {
+            LatLng position = item.getPosition();
+            double lat = position.latitude;
+            double lng = position.longitude;
+            ArtistGeoInfo offsetItem = new ArtistGeoInfo(lat, lng, item.getArtisteName());
+            mClusterManager.addItem(offsetItem);
         }
     }
 }

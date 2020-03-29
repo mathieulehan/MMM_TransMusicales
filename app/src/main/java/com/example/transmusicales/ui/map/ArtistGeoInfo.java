@@ -7,13 +7,11 @@ class ArtistGeoInfo implements ClusterItem {
     private double lat;
     private double lng;
     private String artisteName;
-    private String premiereSalle;
 
-    public ArtistGeoInfo(double lat, double lng, String artisteName, String premiereSalle) {
+    public ArtistGeoInfo(double lat, double lng, String artisteName) {
         this.lat = lat;
         this.lng = lng;
         this.artisteName = artisteName;
-        this.premiereSalle = premiereSalle;
     }
 
     public ArtistGeoInfo(double lat, double lng) {
@@ -58,13 +56,5 @@ class ArtistGeoInfo implements ClusterItem {
 
     public String getArtisteName() {
         return artisteName;
-    }
-
-    public String getPremiereSalle() {
-        return premiereSalle;
-    }
-
-    public void setPremiereSalle(String premiereSalle) {
-        this.premiereSalle = premiereSalle;
     }
 }
