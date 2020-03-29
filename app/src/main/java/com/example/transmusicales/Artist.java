@@ -2,12 +2,15 @@ package com.example.transmusicales;
 
 import androidx.annotation.NonNull;
 
+import java.util.LinkedList;
+
 public class Artist {
     private String datasetid;
     private String recordid;
     public Fields fields;
     public Geometry geometry;
     private String record_timestamp;
+    private LinkedList<String> comments;
 
     public String getUid() {
         return uid;
@@ -90,6 +93,21 @@ public class Artist {
         float moy = (Float.parseFloat(this.getMark())*Float.parseFloat(this.getNbPersonne())+rating)/(Float.parseFloat(getNbPersonne())+1);
         f.setMark(String.valueOf(moy));
         this.setFields(f);
+    }
+
+    public LinkedList<String> getComments() {
+        return comments;
+    }
+
+    public void setComments(LinkedList<String> comments) {
+        this.comments = comments;
+    }
+
+    public void addComment(String newComment) {
+        if (this.comments == null) {
+            this.comments = new LinkedList<>();
+        }
+        this.comments.add(newComment);
     }
 
     public String getMark(){
