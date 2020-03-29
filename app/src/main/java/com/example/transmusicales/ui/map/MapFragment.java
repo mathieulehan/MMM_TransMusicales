@@ -112,7 +112,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         LatLngBounds bounds = builder.build();
         int padding = 0;
-        CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(new MarkerOptions().position(latLng).title("Coin").getPosition(),10F);
+        CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(new MarkerOptions().position(latLng).title("Rennes").getPosition(),5F);
         googleMap.animateCamera(cu);
 
         this.configureClustering();
