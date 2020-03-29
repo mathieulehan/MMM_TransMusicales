@@ -55,7 +55,7 @@ public class SendFragment extends Fragment {
         mFireDataBase = FirebaseDatabase.getInstance();
 
         // STEP 2.1: and from the DB, get a reference
-        Query baseQuery = mFireDataBase.getReference().child("artistes");
+        Query baseQuery = mFireDataBase.getReference().child("artistes").child("2432");
 
         mArtisteDatabaseReference = mFireDataBase.getReference().child("artistes");
 
@@ -83,24 +83,19 @@ public class SendFragment extends Fragment {
         if (mChildEventListener == null) {
             mChildEventListener = new ChildEventListener() {
                 @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    Artist artist = dataSnapshot.getValue(Artist.class);
-                    // don't forget to set the key to identify the Artist!
-                    artist.setUid(dataSnapshot.getKey());
-                    updateArtist(artist);
-                    mAdapter.notifyDataSetChanged();
-                }
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {}
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                    Artist artist = dataSnapshot.getValue(Artist.class);
-                    artist.setUid(dataSnapshot.getKey());
-                    updateArtist(artist);
-                    mAdapter.notifyDataSetChanged();
+                    Artist updatedArtist = dataSnapshot.getValue(Artist.class);
+                    if (updatedArtist.getUid().equals(artist.getUid())) {
+                        updateArtist(updatedArtist);
+                        mAdapter.notifyDataSetChanged();
+                    }
                 }
+
                 @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-                    mAdapter.notifyDataSetChanged();
-                }
+                public void onChildRemoved(DataSnapshot dataSnapshot) {}
+
                 @Override
                 public void onChildMoved(DataSnapshot dataSnapshot, String s) {
                 }
@@ -113,19 +108,14 @@ public class SendFragment extends Fragment {
     }
 
     private void updateArtist(Artist updatedArtist) {
-        if (comments != null) {
-            if (updatedArtist != null) {
-                updatedArtist.setComments(comments);
-                artist = updatedArtist;
-                Log.i("TAG", "updated from DB for " + updatedArtist.getFields().getName().trim());
-            }
-        }
+        artist = updatedArtist;
+        comments = artist.getComments();
+        Log.i("TAG", "updated from DB for " + updatedArtist.getFields().getName().trim());
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout root;
         private TextView comment;
-        private boolean drap = true;
 
         ViewHolder(View itemView) {
             super(itemView);
