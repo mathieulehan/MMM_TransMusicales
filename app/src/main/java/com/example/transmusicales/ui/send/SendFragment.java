@@ -1,7 +1,6 @@
 package com.example.transmusicales.ui.send;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.transmusicales.Artist;
+import com.example.transmusicales.Comment;
 import com.example.transmusicales.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -38,7 +38,8 @@ public class SendFragment extends Fragment {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ChildEventListener mChildEventListener;
     private Artist artist;
-    private LinkedList<String> comments;
+    private LinkedList<Comment> comments;
+    private Comment comment;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,9 +56,9 @@ public class SendFragment extends Fragment {
         mFireDataBase = FirebaseDatabase.getInstance();
 
         // STEP 2.1: and from the DB, get a reference
-        Query baseQuery = mFireDataBase.getReference().child("artistes").child("2432");
+        Query baseQuery = mFireDataBase.getReference().child("artistes").child("2432").child("comments");
 
-        mArtisteDatabaseReference = mFireDataBase.getReference().child("artistes");
+        mArtisteDatabaseReference = mFireDataBase.getReference().child("artistes").child("2432");
 
         // STEP 2.2: get the recycler view
         recyclerView = root.findViewById(R.id.comment_recycler);
@@ -101,12 +102,6 @@ public class SendFragment extends Fragment {
         }
     }
 
-    private void updateArtist(Artist updatedArtist) {
-        artist = updatedArtist;
-        comments = artist.getComments();
-        Log.i("TAG", "updated from DB for " + updatedArtist.getFields().getName().trim());
-    }
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout root;
         private TextView comment;
@@ -121,10 +116,9 @@ public class SendFragment extends Fragment {
             comment.setText(commentValue);
         }
 
-        public void onCommentAdded(Artist artist, DatabaseReference mArtisteDatabaseReference, String newComment) {
+        public void onCommentAdded(Artist artist, DatabaseReference mArtisteDatabaseReference, Comment newComment) {
             if (comment != null) {
-                artist.addComment(newComment);
-                mArtisteDatabaseReference.child(artist.getUid()).child("comments").setValue(artist.getComments());
+                mArtisteDatabaseReference.child(artist.getUid()).child("comments").setValue(newComment);
             }
         }
     }
