@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -19,6 +20,7 @@ import com.example.transmusicales.Comment;
 import com.example.transmusicales.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -76,7 +78,22 @@ public class SendFragment extends Fragment {
         // STEP 4: listen to any change on the DB
         enableUpdatesFromDB();
 
+        TextInputEditText comment = root.findViewById(R.id.inputComment);
+        Button button = root.findViewById(R.id.addCommentButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Comment newComment = new Comment(null, comment.getText().toString());
+                addCommentToArtiste(newComment);
+            }
+        });
+
         return root;
+    }
+
+    private void addCommentToArtiste(Comment newComment) {
+        System.out.println(newComment);
+        mArtisteDatabaseReference.child("comments").setValue(newComment);
     }
 
     // STEP 4: listen to any change on the DB
