@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    app:cardBackgroundColor="@android:color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -16,17 +17,16 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <RelativeLayout
+            android:id="@+id/relLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context="com.example.mchristi.examplerecyclerview.MainActivity"
             tools:showIn="@layout/activity_main">
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scrollbars="vertical" />
-
         </RelativeLayout>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
