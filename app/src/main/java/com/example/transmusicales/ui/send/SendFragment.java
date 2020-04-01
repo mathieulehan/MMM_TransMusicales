@@ -28,7 +28,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class SendFragment extends Fragment {
 
@@ -39,14 +41,12 @@ public class SendFragment extends Fragment {
     private RecyclerView recyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ChildEventListener mChildEventListener;
-    private Artist artist;
-    private LinkedList<Comment> comments;
-    private Comment comment;
+    private List<Comment> comments;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        comments = new LinkedList<>();
+        comments = new ArrayList<>();
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -60,7 +60,7 @@ public class SendFragment extends Fragment {
         // STEP 2.1: and from the DB, get a reference
         Query baseQuery = mFireDataBase.getReference().child("artistes").child("2432").child("comments");
 
-        mArtisteDatabaseReference = mFireDataBase.getReference().child("artistes").child("2432");
+        mArtisteDatabaseReference = mFireDataBase.getReference().child("artistes").child("2432").child("comments");
 
         // STEP 2.2: get the recycler view
         recyclerView = root.findViewById(R.id.comment_recycler);
@@ -83,7 +83,8 @@ public class SendFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Comment newComment = new Comment(null, comment.getText().toString());
+                Comment newComment = new Comment(Objects.requireNonNull(comment.getText()).toString());
+                comments.add(newComment);
                 addCommentToArtiste(newComment);
             }
         });
@@ -91,9 +92,9 @@ public class SendFragment extends Fragment {
         return root;
     }
 
-    private void addCommentToArtiste(Comment newComment) {
-        System.out.println(newComment);
-        mArtisteDatabaseReference.child("comments").setValue(newComment);
+    private void addCommentToArtiste(Comment comment) {
+        String commentKey = mArtisteDatabaseReference.push().getKey();
+        mArtisteDatabaseReference.child(commentKey).setValue(comment.getValue());
     }
 
     // STEP 4: listen to any change on the DB
@@ -101,9 +102,17 @@ public class SendFragment extends Fragment {
         if (mChildEventListener == null) {
             mChildEventListener = new ChildEventListener() {
                 @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {}
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    String comment = dataSnapshot.child("").getValue(String.class);
+                    comments.add(new Comment(comment));
+                    mAdapter.notifyDataSetChanged();
+                }
                 @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    String comment = dataSnapshot.child("").getValue(String.class);
+                    comments.add(new Comment(comment));
+                    mAdapter.notifyDataSetChanged();
+                }
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {}
