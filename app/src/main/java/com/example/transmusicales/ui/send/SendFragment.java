@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -54,13 +55,15 @@ public class SendFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_send, container, false);
 
+        String uid = getArguments().getString("uid", "2432");
+
         // STEP 2 : access the DB...
         mFireDataBase = FirebaseDatabase.getInstance();
 
         // STEP 2.1: and from the DB, get a reference
-        Query baseQuery = mFireDataBase.getReference().child("artistes").child("2432").child("comments");
+        Query baseQuery = mFireDataBase.getReference().child("artistes").child(uid).child("comments");
 
-        mArtisteDatabaseReference = mFireDataBase.getReference().child("artistes").child("2432").child("comments");
+        mArtisteDatabaseReference = mFireDataBase.getReference().child("artistes").child(uid).child("comments");
 
         // STEP 2.2: get the recycler view
         recyclerView = root.findViewById(R.id.comment_recycler);

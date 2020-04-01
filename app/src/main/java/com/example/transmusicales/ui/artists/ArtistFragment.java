@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
@@ -15,7 +16,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,6 +27,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.transmusicales.Artist;
 import com.example.transmusicales.R;
+import com.example.transmusicales.ui.send.SendFragment;
 import com.firebase.ui.database.paging.DatabasePagingOptions;
 import com.firebase.ui.database.paging.FirebaseRecyclerPagingAdapter;
 import com.firebase.ui.database.paging.LoadingState;
@@ -63,10 +68,8 @@ public class ArtistFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_artists, container, false);
 
-        //Test recherche
-        //SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        //recherche
         searchView = root.findViewById(R.id.search_artists);
-        //searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setMaxWidth(Integer.MAX_VALUE);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -231,6 +234,7 @@ public class ArtistFragment extends Fragment {
         return mAdapter;
     }
 
+
     @Override
     public void onStart() {
         super.onStart();
@@ -301,8 +305,7 @@ public class ArtistFragment extends Fragment {
 
     public void setFilter (String searchText, View root){
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("artistes");
-        Query baseQuery = ref.orderByChild("fields/name").startAt(searchText).endAt(searchText+"\uf8ff");
+        Query baseQuery = mArtisteDatabaseReference.orderByChild("fields/name").startAt(searchText);
 
         mAdapter = createFirebaseAdapter(baseQuery, root);
 
@@ -311,7 +314,7 @@ public class ArtistFragment extends Fragment {
         recyclerView.setAdapter(mAdapter);
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout root;
         private TextView artistName;
         private RatingBar artisteMark;
@@ -320,7 +323,7 @@ public class ArtistFragment extends Fragment {
         private ImageView artisteDeezer;
         private ImageView artisteGMaps;
         private TextView artisteMoyenne;
-        private SearchView searchView;
+        private Button comm;
         private boolean drap = true;
 
         ViewHolder(View itemView) {
@@ -333,9 +336,23 @@ public class ArtistFragment extends Fragment {
             artisteDeezer = itemView.findViewById(R.id.deezer);
             artisteGMaps = itemView.findViewById(R.id.gmaps);
             artisteMoyenne = itemView.findViewById(R.id.avg);
+            comm = itemView.findViewById(R.id.comm);
+        }
+
+        private void swapFragment(Artist artist){
+            SendFragment commfragment = new SendFragment();
+            Bundle args = new Bundle();
+            args.putString("uid", artist.getUid());
+            commfragment.setArguments(args);
+
+            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+            ft.addToBackStack(null);
+            ft.replace(R.id.nav_host_fragment, commfragment).commit();
         }
 
         void setArtist(Artist artist) {
+
+            comm.setOnClickListener(view -> swapFragment(artist));
             artistName.setText(artist.getFields().getName().trim());
             if(drap){
                 if(artist.fields.getMark().length()>=4){
