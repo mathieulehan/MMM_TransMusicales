@@ -55,7 +55,7 @@ public class SendFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_send, container, false);
 
-        String uid = getArguments().getString("uid", "2432");
+        String uid = getArguments().getString("uid");
 
         // STEP 2 : access the DB...
         mFireDataBase = FirebaseDatabase.getInstance();
