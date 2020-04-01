@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     public void openSpotifyAlbum(View view) {
         String url = "https://open.spotify.com/album/";
         String album = view.getTag().toString();
-        album = album.replaceAll("spotify:album:", "");
+        album = album.replace("spotify:album:", "");
         url = url + album;
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(url));
@@ -96,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
                  // MAPS OK
             } else {
                 // MAPS PAS OK
+                Log.i("MAPS", "Permission not granted");
             }
         }
     }
@@ -107,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION) && (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_COARSE_LOCATION))) {
+                Log.i("MAPS", "Ask permissions for Google Maps");
             } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},

@@ -16,7 +16,7 @@ public class HomeViewModel extends ViewModel {
                 "Cette application vous permet de vous renseigner davantage sur les artistes qui y seront présents.");
     }
 
-    public LiveData<String> getText() {
+    LiveData<String> getText() {
         return mText;
     }
 }
