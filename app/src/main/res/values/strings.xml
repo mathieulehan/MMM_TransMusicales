@@ -16,4 +16,5 @@
     <string name="mark">Mark</string>
     <string name="style_json">Google Maps styling</string>
     <string name="voici_la_liste_des_artistes_participant_aux_transmusicales">Voici la liste des artistes participant aux Transmusicales :</string>
+    <string name="comment_page">Commentaires concernant l\'artiste sélectionné :</string>
 </resources>
