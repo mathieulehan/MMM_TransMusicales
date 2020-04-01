@@ -1,12 +1,13 @@
 package com.example.transmusicales;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Geometry {
     private String type;
-    ArrayList<Object> coordinates = new ArrayList<Object>();
+    private List<Object> coordinates = new ArrayList<>();
 
-    public Geometry(String type, ArrayList<Object> coordinates) {
+    public Geometry(String type, List<Object> coordinates) {
         this.type = type;
         this.coordinates = coordinates;
     }
@@ -22,11 +23,11 @@ public class Geometry {
         this.type = type;
     }
 
-    public ArrayList<Object> getCoordinates() {
+    public List<Object> getCoordinates() {
         return coordinates;
     }
 
-    public void setCoordinates(ArrayList<Object> coordinates) {
+    public void setCoordinates(List<Object> coordinates) {
         this.coordinates = coordinates;
     }
 }

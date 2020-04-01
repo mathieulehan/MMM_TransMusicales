@@ -1,6 +1,5 @@
 package com.example.transmusicales.ui.map;
 
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,11 +33,10 @@ import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
-    MapView mMapView;
-    private GoogleMap googleMap;
-    LatLngBounds.Builder builder  = new LatLngBounds.Builder();
+    private MapView mMapView;
+    private LatLngBounds.Builder builder  = new LatLngBounds.Builder();
     private ClusterManager<ArtistGeoInfo> mClusterManager;
-    GoogleMap gMap;
+    private GoogleMap gMap;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -54,7 +52,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             try {
                 MapsInitializer.initialize(getActivity().getApplicationContext());
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.getStackTraceString(e);
             }
 
             // Needed to configure the map
@@ -105,13 +103,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // Need to call MapsInitializer before doing any CameraUpdateFactory calls
         MapsInitializer.initialize(Objects.requireNonNull(this.getActivity()));
 
-        Geocoder geocoder = new Geocoder(getActivity());
-
         Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title("Rennes"));
         builder.include(marker.getPosition());
 
-        LatLngBounds bounds = builder.build();
-        int padding = 0;
         CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(new MarkerOptions().position(latLng).title("Rennes").getPosition(),5F);
         googleMap.animateCamera(cu);
 

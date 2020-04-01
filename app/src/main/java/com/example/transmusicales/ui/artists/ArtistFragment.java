@@ -16,8 +16,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.paging.PagedList;
@@ -43,8 +41,6 @@ import java.util.List;
 
 public class ArtistFragment extends Fragment {
 
-    // Firebase reference
-    private FirebaseDatabase mFireDataBase;
     private DatabaseReference mArtisteDatabaseReference;
     private RecyclerView recyclerView;
     private SearchView searchView;
@@ -53,9 +49,10 @@ public class ArtistFragment extends Fragment {
     private FirebaseRecyclerPagingAdapter<Artist, ViewHolder> mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ChildEventListener mChildEventListener;
-    private int pastVisiblesItems, visibleItemCount, totalItemCount;
+    private int pastVisiblesItems;
+    private int visibleItemCount;
+    private int totalItemCount;
     private boolean userScrolled = false;
-    private boolean loading = true;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,7 +86,8 @@ public class ArtistFragment extends Fragment {
         });
 
         // STEP 2 : access the DB...
-        mFireDataBase = FirebaseDatabase.getInstance();
+        // Firebase reference
+        FirebaseDatabase mFireDataBase = FirebaseDatabase.getInstance();
 
         // STEP 2.1: and from the DB, get a reference
         Query baseQuery = mFireDataBase.getReference().child("artistes");
@@ -234,7 +232,6 @@ public class ArtistFragment extends Fragment {
         return mAdapter;
     }
 
-
     @Override
     public void onStart() {
         super.onStart();
@@ -255,16 +252,20 @@ public class ArtistFragment extends Fragment {
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     Artist artist = dataSnapshot.getValue(Artist.class);
                     // don't forget to set the key to identify the Artist!
-                    artist.setUid(dataSnapshot.getKey());
-                    artists.add(artist);
-                    mAdapter.notifyDataSetChanged();
+                    if (artist != null) {
+                        artist.setUid(dataSnapshot.getKey());
+                        artists.add(artist);
+                        mAdapter.notifyDataSetChanged();
+                    }
                 }
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                     Artist artist = dataSnapshot.getValue(Artist.class);
-                    artist.setUid(dataSnapshot.getKey());
-                    updateArtist(artist);
-                    mAdapter.notifyDataSetChanged();
+                    if (artist != null) {
+                        artist.setUid(dataSnapshot.getKey());
+                        updateArtist(artist);
+                        mAdapter.notifyDataSetChanged();
+                    }
                 }
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
@@ -272,9 +273,11 @@ public class ArtistFragment extends Fragment {
                 }
                 @Override
                 public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                    // Not implemented yet
                 }
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
+                    // Not implemented yet
                 }
             };
             mArtisteDatabaseReference.addChildEventListener(mChildEventListener);

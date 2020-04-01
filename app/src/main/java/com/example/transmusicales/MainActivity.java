@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 
@@ -38,8 +39,7 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_map, R.id.nav_slideshow, R.id.nav_artists,
-                R.id.nav_tools, R.id.nav_share, R.id.nav_send)
+                R.id.nav_home, R.id.nav_map, R.id.nav_artists, R.id.nav_send)
                 .setDrawerLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     public void openSpotifyAlbum(View view) {
         String url = "https://open.spotify.com/album/";
         String album = view.getTag().toString();
-        album = album.replaceAll("spotify:album:", "");
+        album = album.replace("spotify:album:", "");
         url = url + album;
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(url));
@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
                  // MAPS OK
             } else {
                 // MAPS PAS OK
+                Log.i("MAPS", "Permission not granted");
             }
         }
     }
@@ -108,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION) && (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_COARSE_LOCATION))) {
+                Log.i("MAPS", "Ask permissions for Google Maps");
             } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},

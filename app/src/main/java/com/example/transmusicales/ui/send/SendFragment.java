@@ -35,11 +35,8 @@ import java.util.Objects;
 
 public class SendFragment extends Fragment {
 
-    // Firebase reference
-    private FirebaseDatabase mFireDataBase;
     private DatabaseReference mArtisteDatabaseReference;
     private FirebaseRecyclerAdapter<String, SendFragment.ViewHolder> mAdapter;
-    private RecyclerView recyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ChildEventListener mChildEventListener;
     private List<Comment> comments;
@@ -58,7 +55,8 @@ public class SendFragment extends Fragment {
         String uid = getArguments().getString("uid");
 
         // STEP 2 : access the DB...
-        mFireDataBase = FirebaseDatabase.getInstance();
+        // Firebase reference
+        FirebaseDatabase mFireDataBase = FirebaseDatabase.getInstance();
 
         // STEP 2.1: and from the DB, get a reference
         Query baseQuery = mFireDataBase.getReference().child("artistes").child(uid).child("comments");
@@ -66,7 +64,7 @@ public class SendFragment extends Fragment {
         mArtisteDatabaseReference = mFireDataBase.getReference().child("artistes").child(uid).child("comments");
 
         // STEP 2.2: get the recycler view
-        recyclerView = root.findViewById(R.id.comment_recycler);
+        RecyclerView recyclerView = root.findViewById(R.id.comment_recycler);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(recyclerView.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
         mSwipeRefreshLayout = root.findViewById(R.id.swipe_refresh_layout);
@@ -112,19 +110,24 @@ public class SendFragment extends Fragment {
                 }
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    // TODO : Edit comment rather than adding a new one
                     String comment = dataSnapshot.child("").getValue(String.class);
                     comments.add(new Comment(comment));
                     mAdapter.notifyDataSetChanged();
                 }
 
                 @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {}
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    // Not implemented yet
+                }
 
                 @Override
                 public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                    // Not implemented yet
                 }
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
+                    // Not implemented yet
                 }
             };
             mArtisteDatabaseReference.addChildEventListener(mChildEventListener);
