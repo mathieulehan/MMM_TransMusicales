@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -19,6 +20,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.transmusicales.Artist;
 import com.example.transmusicales.Comment;
 import com.example.transmusicales.R;
+import com.example.transmusicales.ui.artists.ArtistFragment;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.textfield.TextInputEditText;
@@ -90,6 +92,18 @@ public class SendFragment extends Fragment {
             }
         });
 
+        Button retour = root.findViewById(R.id.retour);
+        retour.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArtistFragment artistFragment = new ArtistFragment();
+
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                ft.addToBackStack(null);
+                ft.replace(R.id.nav_host_fragment, artistFragment).commit();
+            }
+        });
+
         return root;
     }
 
@@ -134,7 +148,7 @@ public class SendFragment extends Fragment {
         }
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout root;
         private TextView comment;
 
@@ -147,6 +161,7 @@ public class SendFragment extends Fragment {
         void setComment(String commentValue) {
             comment.setText(commentValue);
         }
+
 
         public void onCommentAdded(Artist artist, DatabaseReference mArtisteDatabaseReference, Comment newComment) {
             if (comment != null) {

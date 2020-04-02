@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_marginBottom="88dp"
-                android:hint="Votre commentaire..." />
+                android:hint="@string/votre_commentaire" />
 
             <Button
                 android:id="@+id/addCommentButton"
@@ -50,7 +50,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginBottom="88dp"
                 android:layout_toEndOf="@+id/inputComment"
-                android:text="Go !" />
+                android:text="@string/go" />
 
         </RelativeLayout>
 
@@ -64,5 +64,15 @@
         android:text="@string/comment_page"
         app:layout_constraintBottom_toTopOf="@+id/swipe_refresh_layout"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/retour"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="7dp"
+        android:layout_marginTop="2dp"
+        android:text="@string/retour"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
