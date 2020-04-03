@@ -6,7 +6,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/selected_artist_info">
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/infos"
         android:autofillHints=""
         android:layout_height="match_parent"
