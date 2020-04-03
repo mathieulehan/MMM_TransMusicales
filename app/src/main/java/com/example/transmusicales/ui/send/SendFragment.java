@@ -1,12 +1,12 @@
 package com.example.transmusicales.ui.send;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -54,7 +54,7 @@ public class SendFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_send, container, false);
 
-        String uid = getArguments().getString("uid");
+        String uid = Objects.requireNonNull(getArguments()).getString("uid");
 
         // STEP 2 : access the DB...
         // Firebase reference
@@ -71,7 +71,7 @@ public class SendFragment extends Fragment {
         recyclerView.setLayoutManager(linearLayoutManager);
         mSwipeRefreshLayout = root.findViewById(R.id.swipe_refresh_layout);
 
-        mAdapter = createFirebaseAdapter(baseQuery, root);
+        mAdapter = createFirebaseAdapter(baseQuery);
 
         // STEP 2.3: create and set the adapter
         recyclerView.setAdapter(mAdapter);
@@ -170,7 +170,7 @@ public class SendFragment extends Fragment {
         }
     }
 
-    private FirebaseRecyclerAdapter<String, SendFragment.ViewHolder> createFirebaseAdapter(Query baseQuery, View root) {
+    private FirebaseRecyclerAdapter<String, SendFragment.ViewHolder> createFirebaseAdapter(Query baseQuery) {
         FirebaseRecyclerOptions<String> options =
                 new FirebaseRecyclerOptions.Builder<String>()
                         .setQuery(baseQuery, String.class)
@@ -186,7 +186,7 @@ public class SendFragment extends Fragment {
                     @Override
                     public void onError(@NonNull DatabaseError databaseError) {
                         mSwipeRefreshLayout.setRefreshing(false);
-                        databaseError.toException().printStackTrace();
+                        Log.i("DB", "Database error",databaseError.toException());
                         // Handle Error
 
                     }
