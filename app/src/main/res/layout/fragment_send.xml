@@ -44,6 +44,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/addCommentButton"
+                android:fontFamily="sans-serif-smallcaps"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
@@ -60,6 +61,7 @@
         android:id="@+id/textView2"
         android:layout_width="379dp"
         android:layout_height="40dp"
+        android:fontFamily="sans-serif-smallcaps"
         android:layout_marginStart="19dp"
         android:text="@string/comment_page"
         app:layout_constraintBottom_toTopOf="@+id/swipe_refresh_layout"
@@ -67,6 +69,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/retour"
+        android:fontFamily="sans-serif-smallcaps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="7dp"

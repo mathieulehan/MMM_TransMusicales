@@ -23,7 +23,7 @@
             android:layout_width="168dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="3dp"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="sans-serif-smallcaps"
             android:textSize="16sp"
             app:layout_constraintLeft_toRightOf="@id/list_root"
             app:layout_constraintTop_toTopOf="parent" />
@@ -46,10 +46,10 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/avg"
-                android:layout_width="82dp"
+                android:layout_width="73dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="3dp"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="sans-serif-smallcaps"
                 android:textSize="30sp"
                 app:layout_constraintLeft_toRightOf="@id/list_root"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -57,9 +57,10 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/comm"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="46dp"
                 android:layout_weight="1"
-                android:text="Comm" />
+                android:fontFamily="sans-serif-smallcaps"
+                android:text="@string/comm" />
         </LinearLayout>
 
         <com.google.android.material.textview.MaterialTextView
@@ -67,7 +68,7 @@
             android:layout_width="402dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="3dp"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="sans-serif-smallcaps"
             android:textSize="16sp"
             app:layout_constraintLeft_toRightOf="@id/artiste_name"
             app:layout_constraintTop_toTopOf="parent" />

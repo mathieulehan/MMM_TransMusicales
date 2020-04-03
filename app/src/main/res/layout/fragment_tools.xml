@@ -6,6 +6,7 @@
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/text_tools"
+        android:fontFamily="sans-serif-smallcaps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"

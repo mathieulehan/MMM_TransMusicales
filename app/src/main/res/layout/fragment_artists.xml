@@ -36,6 +36,7 @@
         android:layout_width="379dp"
         android:layout_height="40dp"
         android:layout_marginStart="19dp"
+        android:fontFamily="sans-serif-smallcaps"
         android:text="@string/voici_la_liste_des_artistes_participant_aux_transmusicales"
         app:layout_constraintBottom_toTopOf="@+id/swipe_refresh_layout"
         app:layout_constraintStart_toStartOf="parent" />
