@@ -54,7 +54,7 @@ class ArtistGeoInfo implements ClusterItem {
         this.artisteName = artisteName;
     }
 
-    public String getArtisteName() {
+    String getArtisteName() {
         return artisteName;
     }
 }

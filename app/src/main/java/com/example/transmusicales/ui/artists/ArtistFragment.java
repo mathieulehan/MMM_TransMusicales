@@ -1,6 +1,5 @@
 package com.example.transmusicales.ui.artists;
 
-import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +28,7 @@ import com.example.transmusicales.ui.send.SendFragment;
 import com.firebase.ui.database.paging.DatabasePagingOptions;
 import com.firebase.ui.database.paging.FirebaseRecyclerPagingAdapter;
 import com.firebase.ui.database.paging.LoadingState;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -43,8 +43,7 @@ public class ArtistFragment extends Fragment {
 
     private DatabaseReference mArtisteDatabaseReference;
     private RecyclerView recyclerView;
-    private SearchView searchView;
-    List<Artist> artists;
+    private List<Artist> artists;
     //STEP 4: child event lister.
     private FirebaseRecyclerPagingAdapter<Artist, ViewHolder> mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -66,7 +65,7 @@ public class ArtistFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_artists, container, false);
 
         //recherche
-        searchView = root.findViewById(R.id.search_artists);
+        SearchView searchView = root.findViewById(R.id.search_artists);
         searchView.setMaxWidth(Integer.MAX_VALUE);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -180,11 +179,16 @@ public class ArtistFragment extends Fragment {
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Dialog d = new Dialog(root.getContext());
+                                new MaterialAlertDialogBuilder(root.getContext())
+                                        .setTitle(artiste.getFields().getName())
+                                        .setMessage(artiste.toString())
+                                        .setPositiveButton("Ok super !", null)
+                                        .show();
+                                /*Dialog d = new Dialog(root.getContext());
                                 d.setContentView(R.layout.selected_artist_info);
                                 TextView artistInfos = d.findViewById(R.id.infos);
                                 artistInfos.setText(artiste.toString());
-                                d.show();
+                                d.show();*/
                             }
                         });
 
@@ -194,7 +198,7 @@ public class ArtistFragment extends Fragment {
                     @Override
                     protected void onError(@NonNull DatabaseError databaseError) {
                         mSwipeRefreshLayout.setRefreshing(false);
-                        databaseError.toException().printStackTrace();
+                        Log.i("DB", "Database Error", databaseError.toException());
                         // Handle Error
 
                     }
@@ -358,10 +362,10 @@ public class ArtistFragment extends Fragment {
             comm.setOnClickListener(view -> swapFragment(artist));
             artistName.setText(artist.getFields().getName().trim());
             if(drap){
-                if(artist.fields.getMark().length()>=4){
-                    artisteMoyenne.setText(artist.fields.getMark().substring(0,4));
+                if(artist.getFields().getMark().length()>=4){
+                    artisteMoyenne.setText(artist.getFields().getMark().substring(0,4));
                 }else{
-                    artisteMoyenne.setText(artist.fields.getMark());
+                    artisteMoyenne.setText(artist.getFields().getMark());
                 }
                 drap = false;
             }
@@ -392,12 +396,12 @@ public class ArtistFragment extends Fragment {
                 public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
 
                     if(rating != 0.0){
-                        artist.fields.setNbpersonne(String.valueOf(Integer.parseInt(artist.getNbPersonne())+1));
-                        Float moy = (Float.parseFloat(artist.fields.getMark())*Float.parseFloat(artist.fields.getNbpersonne())+rating)/(Float.parseFloat(artist.fields.getNbpersonne())+1);
-                        artist.fields.setMark(String.valueOf(rating));
+                        artist.getFields().setNbpersonne(String.valueOf(Integer.parseInt(artist.getNbPersonne())+1));
+                        Float moy = (Float.parseFloat(artist.getFields().getMark())*Float.parseFloat(artist.getFields().getNbpersonne())+rating)/(Float.parseFloat(artist.getFields().getNbpersonne())+1);
+                        artist.getFields().setMark(String.valueOf(rating));
                         System.out.println("Artiste : "+rating);
                         mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("mark").setValue(String.valueOf(moy));
-                        mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("nbpersonne").setValue(artist.fields.getNbpersonne());
+                        mArtisteDatabaseReference.child(artist.getUid()).child("fields").child("nbpersonne").setValue(artist.getFields().getNbpersonne());
                         if(String.valueOf(moy).length()>=4){
                             artisteMoyenne.setText(String.valueOf(moy).substring(0,4));
                         }else{

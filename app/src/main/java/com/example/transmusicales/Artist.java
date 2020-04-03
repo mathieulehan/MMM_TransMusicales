@@ -5,8 +5,8 @@ import androidx.annotation.NonNull;
 public class Artist {
     private String datasetid;
     private String recordid;
-    public Fields fields;
-    public Geometry geometry;
+    private Fields fields;
+    private Geometry geometry;
     private String record_timestamp;
 
     public String getUid() {
